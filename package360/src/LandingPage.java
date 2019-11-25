@@ -31,7 +31,6 @@ public class LandingPage extends JFrame {
                 System.out.println(selectedFile.getAbsolutePath());
             }
         });
-
     }
 
     public static void main(String[] args) {

@@ -10,7 +10,7 @@ public class LandingPage extends JFrame {
     }
 
     private void initUI() {
-        setTitle("Grade Analytics");
+        setTitle("Grade Analytics - Load new File");
         setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -53,7 +53,8 @@ public class LandingPage extends JFrame {
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = jfc.getSelectedFile();
-                System.out.println(selectedFile.getAbsolutePath()); // Add
+                selectedFile.list();
+                var test = new MainPage(); // Add
                 // logic to create dataset from the file data
             }
         });

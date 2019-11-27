@@ -5,10 +5,10 @@ import javax.swing.filechooser.FileSystemView;
 
 public class LandingPage extends JFrame {
 
-    private SetBoundary Bounds;
+    private SetBoundary bounds;
 
     private LandingPage() {
-        Bounds = SetBoundary.updateBoundaries(0, 0);
+        bounds = SetBoundary.updateBoundaries(0, 0);
         initUI();
     }
 
@@ -50,13 +50,13 @@ public class LandingPage extends JFrame {
 
         //set button
         JButton setBoundaries = new JButton("Set Bounds");
-        setBoundaries.setBounds(670, 100, 60, 30);
+        setBoundaries.setBounds(600, 100, 120, 30);
         add(setBoundaries);
         setBoundaries.addActionListener(e -> {
             if (!tfLower.getText().isEmpty() && !tfUpper.getText().isEmpty()) {
                 int low = Integer.parseInt(tfLower.getText());
                 int high = Integer.parseInt(tfUpper.getText());
-                Bounds = new SetBoundary(low, high);
+                bounds = SetBoundary.updateBoundaries(low, high);
                 boundSet.setVisible(true);
                 emptyBounds.setVisible(false);
             }
@@ -72,6 +72,8 @@ public class LandingPage extends JFrame {
         add(browseButton);
         browseButton.setBounds(20, 200, 100, 30);
         browseButton.addActionListener(e -> {
+            emptyBounds.setVisible(false);
+            boundSet.setVisible(false);
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             jfc.setDialogTitle("Select a csv or txt");
             jfc.setAcceptAllFileFilterUsed(false);

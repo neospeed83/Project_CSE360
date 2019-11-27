@@ -1,15 +1,22 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.nio.file.NoSuchFileException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 public class LandingPage extends JFrame {
 
     private SetBoundary bounds;
+    private static boolean errorFlag = false;
 
     private LandingPage() {
-        bounds = SetBoundary.updateBoundaries(0, 0);
+        bounds = SetBoundary.updateBoundaries(0, 9999);
         initUI();
+    }
+
+    public static void setErrorFlag(boolean errorFlag) {
+        LandingPage.errorFlag = errorFlag;
     }
 
     private void initUI() {
@@ -59,8 +66,7 @@ public class LandingPage extends JFrame {
                 bounds = SetBoundary.updateBoundaries(low, high);
                 boundSet.setVisible(true);
                 emptyBounds.setVisible(false);
-            }
-            else{
+            } else {
                 emptyBounds.setVisible(true);
                 boundSet.setVisible(false);
             }
@@ -81,15 +87,23 @@ public class LandingPage extends JFrame {
                     new FileNameExtensionFilter("txt or csv files", "csv",
                             "txt");
             jfc.addChoosableFileFilter(filter);
-            int returnValue = jfc.showOpenDialog(null);
+            int returnValue = jfc.showOpenDialog(this);
 
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
+            if (!jfc.getSelectedFile().exists()) {
+                errorFlag = true;
+                JOptionPane.showMessageDialog(this,
+                        "Please check your file name",
+                        "File Does not exist!",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
+                    setVisible(false);
                     var test = new MainPage(jfc.getSelectedFile());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                // Add logic to create dataset from the file data
             }
         });
     }

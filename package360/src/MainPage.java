@@ -3,6 +3,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.util.List;
+import org.jfree.chart;
 
 class MainPage extends JFrame {
 
@@ -17,12 +18,12 @@ class MainPage extends JFrame {
     private void InitMainUI() throws Exception {
         setLayout(null);
         setTitle("Grade Analytics - Main Page :" + selectedFile.getName());
-        setSize(800, 1000);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        // Load file dataset into -> content
-        List<Integer> content = ReadFile.readFileByName(selectedFile.getPath());
-        for (Integer i : content) {
+        // Load file dataset into -> dataset
+        List<Integer> dataset = ReadFile.readFileByName(selectedFile.getPath());
+        for (Integer i : dataset) {
             int higher = i.compareTo(SetBoundary.getHigherBound());
             int lower = i.compareTo(SetBoundary.getLowerBound());
             if (higher > 0 || lower < 0) {
@@ -37,8 +38,10 @@ class MainPage extends JFrame {
                     "Data Boundary Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
-            setVisible(true);
-            //browse button
+
+            setVisible(true); // Display Main Page
+
+            //append button
             JButton appendFile = new JButton("Append a file");
             add(appendFile);
             appendFile.setBounds(20, 40, 120, 30);
@@ -65,20 +68,50 @@ class MainPage extends JFrame {
                             }
                         }
                         if (!boundaryFlag) {
-                            JOptionPane.showMessageDialog(this,
+                            JOptionPane.showMessageDialog(jfc,
                                     "The file contains out of bounds data!",
                                     "Data Boundary Error",
                                     JOptionPane.ERROR_MESSAGE);
                         } else {
-                            content.addAll(append); // Append to dataset
-                            System.out.println(content);
+                            dataset.addAll(append); // Append to dataset
+                            System.out.println(dataset);
                         }
-
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
             });
-        }
+
+            // Display data button
+            JButton display = new JButton("Display");
+            display.setBounds(20, 150, 100, 30);
+            add(display);
+
+            // Display TextArea
+            JTextArea displayData = new JTextArea();
+            displayData.setEditable(false);
+            displayData.setBounds(20, 250, 400, 300);
+            displayData.setLineWrap(true);
+            displayData.setVisible(false);
+            add(displayData);
+            display.addActionListener(e -> {
+                displayData.setText("");
+                dataset.sort(null);
+                for (Integer element : dataset) {
+                    displayData.append(element + " ");
+                }
+                displayData.setVisible(true);
+            });
+
+            JTabbedPane tabbedPane = new JTabbedPane();
+            tabbedPane.addTab("Display Data", displayData);
+            tabbedPane.addTab("Display Graph", new JPanel());
+            tabbedPane.addTab("Analyse Data", new JPanel());
+            tabbedPane.addTab("Distribution Graph", new JPanel());
+            tabbedPane.setBounds(200, 200, 600, 300);
+            add(tabbedPane);
+            tabbedPane.setVisible(true);
+
+        } // else Display main page
     }
 }

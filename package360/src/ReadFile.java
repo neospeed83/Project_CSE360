@@ -1,6 +1,7 @@
 // Java program to illustrate reading data from file
 // using nio.File
 
+import javax.swing.*;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -28,6 +29,11 @@ class ReadFile {
                         elements = null;
                     }
             }
+        } catch (NoSuchFileException | FileNotFoundException e) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Please check your file name",
+                    "File Does not exist!",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
             System.out.println("Invalid data detected in input file");
         } catch (IOException e) {

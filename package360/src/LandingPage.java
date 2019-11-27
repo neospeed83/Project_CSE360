@@ -14,12 +14,12 @@ public class LandingPage extends JFrame {
 
     private void initUI() {
         setTitle("Grade Analytics - Load new File");
-        setSize(800, 600);
+        setSize(800, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         //set boundaries
-        JLabel lowerBound = new JLabel("select lower bound");
+        JLabel lowerBound = new JLabel("Lower bound");
         JTextField tfLower = new JTextField(50);
         lowerBound.setLabelFor(tfLower);
         setLayout(null);
@@ -28,7 +28,7 @@ public class LandingPage extends JFrame {
         lowerBound.setBounds(20, 100, 120, 30);
         tfLower.setBounds(150, 100, 50, 30);
 
-        JLabel upperBound = new JLabel("select upper bound");
+        JLabel upperBound = new JLabel("Upper bound");
         JTextField tfUpper = new JTextField(50);
         upperBound.setLabelFor(tfUpper);
         add(upperBound);
@@ -37,7 +37,7 @@ public class LandingPage extends JFrame {
         tfUpper.setBounds(460, 100, 50, 30);
 
         //set button
-        JButton setBoundaries = new JButton("Set");
+        JButton setBoundaries = new JButton("Set Bounds");
         setBoundaries.setBounds(670, 100, 60, 30);
         add(setBoundaries);
         setBoundaries.addActionListener(e -> {

@@ -4,12 +4,12 @@ class SetBoundary {
     private static int higherBound;
     private static SetBoundary boundaryObject;
 
-    private SetBoundary(int low, int high) {
+    SetBoundary(int low, int high) {
         lowerBound = low;
         higherBound = high;
     }
 
-    public static SetBoundary updateBoundaries(int low, int high){
+    static SetBoundary updateBoundaries(int low, int high){
         if (boundaryObject == null)
             boundaryObject = new SetBoundary(low, high);
         return boundaryObject;

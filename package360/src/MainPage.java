@@ -27,7 +27,7 @@ class MainPage extends JFrame {
             }
         }
         if (!boundaryFlag) {
-            int n = JOptionPane.showOptionDialog(new JFrame(), "Data in " +
+            int n = JOptionPane.showOptionDialog(this, "Data in " +
                             "file exceeds set bounds",
                     "Data out of bounds", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,

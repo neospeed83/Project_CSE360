@@ -8,7 +8,7 @@ public class LandingPage extends JFrame {
     private SetBoundary Bounds;
 
     private LandingPage() {
-        Bounds = new SetBoundary(0, 0);
+        Bounds = SetBoundary.updateBoundaries(0, 0);
         initUI();
     }
 
@@ -36,15 +36,36 @@ public class LandingPage extends JFrame {
         upperBound.setBounds(320, 100, 120, 30);
         tfUpper.setBounds(460, 100, 50, 30);
 
+        // Boundaries set message
+        JLabel boundSet = new JLabel("Boundaries Set Successfully.");
+        boundSet.setBounds(370, 30, 300, 30);
+        add(boundSet);
+        boundSet.setVisible(false);
+
+        // Error: Bounds can't be empty
+        JLabel emptyBounds = new JLabel("Upper / Lower Bound can't be empty");
+        emptyBounds.setBounds(370, 30, 300, 30);
+        add(emptyBounds);
+        emptyBounds.setVisible(false);
+
         //set button
         JButton setBoundaries = new JButton("Set Bounds");
         setBoundaries.setBounds(670, 100, 60, 30);
         add(setBoundaries);
         setBoundaries.addActionListener(e -> {
+            if (!tfLower.getText().isEmpty() && !tfUpper.getText().isEmpty()) {
                 int low = Integer.parseInt(tfLower.getText());
                 int high = Integer.parseInt(tfUpper.getText());
                 Bounds = new SetBoundary(low, high);
+                boundSet.setVisible(true);
+                emptyBounds.setVisible(false);
+            }
+            else{
+                emptyBounds.setVisible(true);
+                boundSet.setVisible(false);
+            }
         });
+
 
         //browse button
         JButton browseButton = new JButton("load a file");
@@ -62,7 +83,7 @@ public class LandingPage extends JFrame {
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
-                    var test = new MainPage(jfc.getSelectedFile(), Bounds);
+                    var test = new MainPage(jfc.getSelectedFile());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

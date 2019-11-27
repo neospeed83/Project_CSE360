@@ -5,10 +5,10 @@ import javax.swing.filechooser.FileSystemView;
 
 public class LandingPage extends JFrame {
 
-    private SetBoundaries Bounds;
+    private SetBoundary Bounds;
 
     private LandingPage() {
-        Bounds = new SetBoundaries(0, 0);
+        Bounds = new SetBoundary(0, 0);
         initUI();
     }
 
@@ -43,7 +43,7 @@ public class LandingPage extends JFrame {
         setBoundaries.addActionListener(e -> {
                 int low = Integer.parseInt(tfLower.getText());
                 int high = Integer.parseInt(tfUpper.getText());
-                Bounds = new SetBoundaries(low, high);
+                Bounds = new SetBoundary(low, high);
         });
 
         //browse button
@@ -61,7 +61,11 @@ public class LandingPage extends JFrame {
             int returnValue = jfc.showOpenDialog(null);
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                var test = new MainPage(jfc.getSelectedFile(), Bounds);
+                try {
+                    var test = new MainPage(jfc.getSelectedFile(), Bounds);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 // Add logic to create dataset from the file data
             }
         });

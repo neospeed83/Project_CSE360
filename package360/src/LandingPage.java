@@ -1,11 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 public class LandingPage extends JFrame {
+
+    private SetBoundaries Bounds;
+
     private LandingPage() {
+        Bounds = new SetBoundaries(0, 0);
         initUI();
     }
 
@@ -33,9 +36,15 @@ public class LandingPage extends JFrame {
         upperBound.setBounds(320, 100, 120, 30);
         tfUpper.setBounds(460, 100, 50, 30);
 
+        //set button
         JButton setBoundaries = new JButton("Set");
         setBoundaries.setBounds(670, 100, 60, 30);
         add(setBoundaries);
+        setBoundaries.addActionListener(e -> {
+                int low = Integer.parseInt(tfLower.getText());
+                int high = Integer.parseInt(tfUpper.getText());
+                Bounds = new SetBoundaries(low, high);
+        });
 
         //browse button
         JButton browseButton = new JButton("load a file");
@@ -52,10 +61,8 @@ public class LandingPage extends JFrame {
             int returnValue = jfc.showOpenDialog(null);
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = jfc.getSelectedFile();
-                selectedFile.list();
-                var test = new MainPage(); // Add
-                // logic to create dataset from the file data
+                var test = new MainPage(jfc.getSelectedFile(), Bounds);
+                // Add logic to create dataset from the file data
             }
         });
     }

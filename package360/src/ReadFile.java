@@ -34,15 +34,15 @@ class ReadFile {
                     "Please check your file name",
                     "File Does not exist!",
                     JOptionPane.ERROR_MESSAGE);
-            LandingPage.setErrorFlag(true);
+            LandingPage.setErrorFlag();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(new JFrame(),
                     "Please check your Input file",
                     "Invalid file data!",
                     JOptionPane.ERROR_MESSAGE);
-            LandingPage.setErrorFlag(true);
+            LandingPage.setErrorFlag();
         } catch (IOException e) {
-            LandingPage.setErrorFlag(true);
+            LandingPage.setErrorFlag();
         }
 
         return result;

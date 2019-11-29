@@ -21,7 +21,7 @@ class MainPage extends JDialog {
     private List<Integer> fileData;
     private DefaultCategoryDataset dataset;
     //Flags
-    private static boolean boundaryFlag = true;
+    static boolean boundaryFlag = true;
 
     MainPage(File inputFile) {
         selectedFile = inputFile;
@@ -35,7 +35,6 @@ class MainPage extends JDialog {
         setTitle("Grade Analytics - Main Page : " + selectedFile.getName());
         setSize(1280, 720);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(800, 500));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 
@@ -278,6 +277,8 @@ class MainPage extends JDialog {
             displayAnalysis.setBounds(20, 250, 150, 30);
             add(displayAnalysis);
 
+            Analysis analysisPanel = new Analysis(fileData);
+
             // Display distribution graph button
             JButton displayDistribution = new JButton("Distribution Graph");
             displayDistribution.setBounds(20, 300, 150, 30);
@@ -285,7 +286,7 @@ class MainPage extends JDialog {
 
             tabbedPane.addTab("Display Data", displayData);
             tabbedPane.addTab("Display Graph", chartPanel);
-            tabbedPane.addTab("Data Analysis", new JPanel());
+            tabbedPane.addTab("Data Analysis", analysisPanel);
             tabbedPane.addTab("Distribution Graph", new JPanel());
             tabbedPane.setBounds(200, 150, 1000, 450);
             add(tabbedPane);

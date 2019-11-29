@@ -15,8 +15,8 @@ public class LandingPage extends JFrame {
     }
 
 
-    public static void setErrorFlag(boolean errorFlag) {
-        LandingPage.errorFlag = errorFlag;
+    static void setErrorFlag() {
+        LandingPage.errorFlag = true;
     }
 
     private void initUI() {
@@ -68,7 +68,7 @@ public class LandingPage extends JFrame {
                     int low = Integer.parseInt(tfLower.getText());
                     int high = Integer.parseInt(tfUpper.getText());
                     SetBoundary.updateBoundaries(low, high);
-
+                    MainPage.boundaryFlag = true;
                     boundSet.setVisible(true);
                     emptyBounds.setVisible(false);
 
@@ -113,6 +113,7 @@ public class LandingPage extends JFrame {
                 if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
                         new MainPage(jfc.getSelectedFile());
+                        //setEnabled(false);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

@@ -9,14 +9,13 @@ class SetBoundary {
         higherBound = high;
     }
 
-    static SetBoundary updateBoundaries(int low, int high) {
+    static void updateBoundaries(int low, int high) {
         if (boundaryObject == null) {
             boundaryObject = new SetBoundary(low, high);
         } else {
             SetBoundary.setLowerBound(low);
             SetBoundary.setHigherBound(high);
         }
-        return boundaryObject;
     }
 
     static int getLowerBound() {

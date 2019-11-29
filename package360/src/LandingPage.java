@@ -7,16 +7,12 @@ import javax.swing.filechooser.FileSystemView;
 
 public class LandingPage extends JFrame {
 
-    private SetBoundary bounds;
     private static boolean errorFlag = false;
 
     private LandingPage() {
-        bounds = SetBoundary.updateBoundaries(0, 9999);
+        //set default bounds 0, 9999
+        SetBoundary.updateBoundaries(0, 9999);
         initUI();
-    }
-
-    public static void setErrorFlag(boolean errorFlag) {
-        LandingPage.errorFlag = errorFlag;
     }
 
     private void initUI() {
@@ -61,11 +57,21 @@ public class LandingPage extends JFrame {
         add(setBoundaries);
         setBoundaries.addActionListener(e -> {
             if (!tfLower.getText().isEmpty() && !tfUpper.getText().isEmpty()) {
-                int low = Integer.parseInt(tfLower.getText());
-                int high = Integer.parseInt(tfUpper.getText());
-                bounds = SetBoundary.updateBoundaries(low, high);
-                boundSet.setVisible(true);
-                emptyBounds.setVisible(false);
+
+                try {
+                    int low = Integer.parseInt(tfLower.getText());
+                    int high = Integer.parseInt(tfUpper.getText());
+                    SetBoundary.updateBoundaries(low, high);
+
+                    boundSet.setVisible(true);
+                    emptyBounds.setVisible(false);
+
+                }catch (NumberFormatException ex5){
+                    JOptionPane.showMessageDialog(this,
+                            "Please enter a number",
+                            "Invalid input detected",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 emptyBounds.setVisible(true);
                 boundSet.setVisible(false);
@@ -100,7 +106,7 @@ public class LandingPage extends JFrame {
             if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
                     setVisible(false);
-                    var test = new MainPage(jfc.getSelectedFile());
+                    new MainPage(jfc.getSelectedFile());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

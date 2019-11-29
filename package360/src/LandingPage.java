@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileNotFoundException;
-import java.nio.file.NoSuchFileException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
@@ -9,10 +7,16 @@ public class LandingPage extends JFrame {
 
     private static boolean errorFlag = false;
 
+
     private LandingPage() {
         //set default bounds 0, 9999
         SetBoundary.updateBoundaries(0, 9999);
         initUI();
+    }
+
+
+    public static void setErrorFlag(boolean errorFlag) {
+        LandingPage.errorFlag = errorFlag;
     }
 
     private void initUI() {
@@ -26,6 +30,7 @@ public class LandingPage extends JFrame {
         JTextField tfLower = new JTextField(50);
         lowerBound.setLabelFor(tfLower);
         setLayout(null);
+        tfLower.setText(Integer.toString(SetBoundary.getLowerBound()));
         add(lowerBound);
         add(tfLower);
         lowerBound.setBounds(20, 100, 120, 30);
@@ -34,6 +39,7 @@ public class LandingPage extends JFrame {
         JLabel upperBound = new JLabel("Upper bound");
         JTextField tfUpper = new JTextField(50);
         upperBound.setLabelFor(tfUpper);
+        tfUpper.setText(Integer.toString(SetBoundary.getHigherBound()));
         add(upperBound);
         add(tfUpper);
         upperBound.setBounds(320, 100, 120, 30);
@@ -66,7 +72,7 @@ public class LandingPage extends JFrame {
                     boundSet.setVisible(true);
                     emptyBounds.setVisible(false);
 
-                }catch (NumberFormatException ex5){
+                } catch (NumberFormatException ex5) {
                     JOptionPane.showMessageDialog(this,
                             "Please enter a number",
                             "Invalid input detected",
@@ -95,20 +101,21 @@ public class LandingPage extends JFrame {
             jfc.addChoosableFileFilter(filter);
             int returnValue = jfc.showOpenDialog(this);
 
-            if (!jfc.getSelectedFile().exists()) {
-                errorFlag = true;
-                JOptionPane.showMessageDialog(this,
-                        "Please check your file name",
-                        "File Does not exist!",
-                        JOptionPane.ERROR_MESSAGE);
-            }
+            if (jfc.getSelectedFile() != null) {
+                if (!jfc.getSelectedFile().exists()) {
+                    errorFlag = true;
+                    JOptionPane.showMessageDialog(this,
+                            "Please check your file name",
+                            "File Does not exist!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
 
-            if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
-                try {
-                    setVisible(false);
-                    new MainPage(jfc.getSelectedFile());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        new MainPage(jfc.getSelectedFile());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });

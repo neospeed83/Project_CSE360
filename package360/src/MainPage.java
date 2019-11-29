@@ -15,28 +15,29 @@ import java.io.File;
 import java.util.List;
 
 
-class MainPage extends JFrame {
+class MainPage extends JDialog {
 
     private File selectedFile;
     private List<Integer> fileData;
     private DefaultCategoryDataset dataset;
     //Flags
     private static boolean boundaryFlag = true;
-    private static boolean updateFlag = false;
 
-    MainPage(File inputFile) throws Exception {
+    MainPage(File inputFile) {
         selectedFile = inputFile;
         dataset = new DefaultCategoryDataset();
         InitMainUI();
     }
 
-    private void InitMainUI() throws Exception {
+    private void InitMainUI() {
         setLayout(null);
+
         setTitle("Grade Analytics - Main Page : " + selectedFile.getName());
-        setSize(1000, 600);
+        setSize(1280, 720);
         setLocationRelativeTo(null);
-        this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(800, 500));
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
 
         // Load file fileData into -> fileData
         fileData = ReadFile.readFileByName(selectedFile.getPath());
@@ -99,7 +100,6 @@ class MainPage extends JFrame {
                                     JOptionPane.ERROR_MESSAGE);
                         } else {
                             fileData.addAll(append); // Append to fileData
-                            updateFlag = true;
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -114,6 +114,11 @@ class MainPage extends JFrame {
             displayData.setLineWrap(true);
             displayData.setVisible(false);
             add(displayData);
+
+
+            // Declaring Tabbed pane here to change active tab on button click
+            JTabbedPane tabbedPane = new JTabbedPane();
+
 
             // Refresh Section Label
             JLabel refreshSection = new JLabel("Refresh:");
@@ -134,6 +139,7 @@ class MainPage extends JFrame {
                     displayData.append(element + " ");
                 }
                 displayData.setVisible(true);
+                tabbedPane.setSelectedIndex(0);
             });
 
             // Display Graph button
@@ -264,6 +270,7 @@ class MainPage extends JFrame {
 
                 // Set new dataset
                 chartPlot.setDataset(dataSet1);
+                tabbedPane.setSelectedIndex(1);
             });
 
             // Display Analysis button
@@ -276,7 +283,6 @@ class MainPage extends JFrame {
             displayDistribution.setBounds(20, 300, 150, 30);
             add(displayDistribution);
 
-            JTabbedPane tabbedPane = new JTabbedPane();
             tabbedPane.addTab("Display Data", displayData);
             tabbedPane.addTab("Display Graph", chartPanel);
             tabbedPane.addTab("Data Analysis", new JPanel());
@@ -286,8 +292,7 @@ class MainPage extends JFrame {
             tabbedPane.setVisible(true);
 
         } // else Display main page
-    }
-
+    }// End Init ui
 }
 
 

@@ -18,15 +18,25 @@ import java.util.List;
 class MainPage extends JDialog {
 
     private File selectedFile;
-    private List<Integer> fileData;
+    private static List<Integer> fileData;
     private DefaultCategoryDataset dataset;
+    private static DefaultCategoryDataset distributionDataset;
     //Flags
     static boolean boundaryFlag = true;
 
     MainPage(File inputFile) {
         selectedFile = inputFile;
         dataset = new DefaultCategoryDataset();
+        distributionDataset = new DefaultCategoryDataset();
         InitMainUI();
+    }
+
+    static List<Integer> getFileData() {
+        return fileData;
+    }
+
+    public static DefaultCategoryDataset getDistributionDataset() {
+        return distributionDataset;
     }
 
     private void InitMainUI() {
@@ -67,9 +77,9 @@ class MainPage extends JDialog {
             add(addSection);
 
             // Append button
-            JButton appendFile = new JButton("Add a file");
+            JButton appendFile = new JButton("Append another file");
             add(appendFile);
-            appendFile.setBounds(20, 50, 120, 30);
+            appendFile.setBounds(20, 50, 150, 30);
             appendFile.addActionListener(e -> {
                 JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
                 jfc.setDialogTitle("Select a csv or txt to append");
@@ -277,17 +287,29 @@ class MainPage extends JDialog {
             displayAnalysis.setBounds(20, 250, 150, 30);
             add(displayAnalysis);
 
-            Analysis analysisPanel = new Analysis(fileData);
+            Analysis analysisPanel = new Analysis();
+            displayAnalysis.addActionListener(e -> {
+                analysisPanel.update();
+                analysisPanel.repaint();
+                tabbedPane.setSelectedIndex(2);
+            });
 
             // Display distribution graph button
             JButton displayDistribution = new JButton("Distribution Graph");
             displayDistribution.setBounds(20, 300, 150, 30);
             add(displayDistribution);
 
+            DistributionGraph distributionGraph = new DistributionGraph();
+            displayDistribution.addActionListener(e -> {
+                distributionGraph.updateGraph();
+                distributionGraph.repaint();
+                tabbedPane.setSelectedIndex(3);
+            });
+
             tabbedPane.addTab("Display Data", displayData);
             tabbedPane.addTab("Display Graph", chartPanel);
             tabbedPane.addTab("Data Analysis", analysisPanel);
-            tabbedPane.addTab("Distribution Graph", new JPanel());
+            tabbedPane.addTab("Distribution Graph", distributionGraph);
             tabbedPane.setBounds(200, 150, 1000, 450);
             add(tabbedPane);
             tabbedPane.setVisible(true);

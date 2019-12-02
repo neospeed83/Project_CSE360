@@ -8,8 +8,8 @@ class Analysis extends JPanel {
     private JTextField count, high, low, mean, median, mode;
     private List<Integer> data;
 
-    Analysis(List<Integer> inputData) {
-        data = inputData;
+    Analysis() {
+        data = MainPage.getFileData();
         count = new JTextField();
         count.setEditable(false);
         mean = new JTextField();
@@ -26,66 +26,47 @@ class Analysis extends JPanel {
     }
 
     private void InitUI() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        setLayout(null);
+
         // Tab 3 - Analyse Data
         // Count, Mean Median and Mode fields
+
         JLabel labelCount = new JLabel("Count");
         labelCount.setLabelFor(count);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-
-        //labelCount.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelCount.setBounds(400,250,200,30);
-        add(labelCount, constraints);
+        labelCount.setFont(new Font("Serif", Font.BOLD, 14));
+        labelCount.setBounds(20, 50, 150, 30);
+        add(labelCount);
 
         JLabel labelHigh = new JLabel("High");
         labelHigh.setLabelFor(high);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;
-        constraints.gridy = 2;
-        //labelMode.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelMode.setBounds(400,400,200,30);
-        add(labelHigh, constraints);
+        labelHigh.setFont(new Font("Serif", Font.BOLD, 14));
+        labelHigh.setBounds(20, 100, 150, 30);
+        add(labelHigh);
 
         JLabel labelLow = new JLabel("Low");
         labelLow.setLabelFor(low);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;
-        constraints.gridy = 3;
-        //labelMode.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelMode.setBounds(400,400,200,30);
-        add(labelLow, constraints);
+        labelLow.setFont(new Font("Serif", Font.BOLD, 14));
+        labelLow.setBounds(20, 150, 150, 30);
+        add(labelLow);
 
 
         JLabel labelMean = new JLabel("Mean");
         labelMean.setLabelFor(mean);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;
-        constraints.gridy = 4;
-        //labelMean.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelMean.setBounds(400,3000,200,30);
-        add(labelMean, constraints);
+        labelMean.setFont(new Font("Serif", Font.BOLD, 14));
+        labelMean.setBounds(20, 200, 150, 30);
+        add(labelMean);
 
         JLabel labelMedian = new JLabel("Median");
         labelMedian.setLabelFor(median);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;
-        constraints.gridy = 5;
-        //labelMedian.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelMedian.setBounds(400,350,200,30);
-        add(labelMedian, constraints);
+        labelMedian.setFont(new Font("Serif", Font.BOLD, 14));
+        labelMedian.setBounds(20, 250, 150, 30);
+        add(labelMedian);
 
         JLabel labelMode = new JLabel("Mode");
         labelMode.setLabelFor(mode);
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 1;
-        constraints.gridy = 6;
-        //labelMode.setFont(new Font("Serif",Font.BOLD, 14));
-        //labelMode.setBounds(400,400,200,30);
-        add(labelMode, constraints);
-
+        labelMode.setFont(new Font("Serif", Font.BOLD, 14));
+        labelMode.setBounds(20, 300, 200, 30);
+        add(labelMode);
 
 
         // TextFields and Calculations
@@ -93,10 +74,10 @@ class Analysis extends JPanel {
         int max = Integer.MIN_VALUE;
         int min = Integer.MAX_VALUE;
 
-        for(Integer i : data){
-            if(max < i)
+        for (Integer i : data) {
+            if (max < i)
                 max = i;
-            if(min > i)
+            if (min > i)
                 min = i;
         }
 
@@ -109,63 +90,82 @@ class Analysis extends JPanel {
 
 
         count.setText(Integer.toString(cnt));
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 1;
-        //mean.setBounds(500,650,200, 30);
-        add(count, constraints);
+        count.setBounds(120, 50, 200, 30);
+        add(count);
 
         high.setText(Integer.toString(max));
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 2;
-        //mean.setBounds(500,650,200, 30);
-        add(high, constraints);
+        high.setBounds(120, 100, 200, 30);
+        add(high);
 
         low.setText(Integer.toString(min));
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 3;
-        //mean.setBounds(500,650,200, 30);
-        add(low, constraints);
+        low.setBounds(120, 150, 200, 30);
+        add(low);
 
         mean.setText(Integer.toString(sum / cnt));
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 4;
-        //mean.setBounds(500,550,200, 30);
-        add(mean, constraints);
+        mean.setBounds(120, 200, 200, 30);
+        add(mean);
 
 
         //Median
-        if(cnt % 2 != 0){
-            median.setText(Integer.toString(data.get(cnt/2)));
-        }else{
+        if (cnt % 2 != 0) {
+            median.setText(Integer.toString(data.get(cnt / 2)));
+        } else {
             double med =
-                    ((double)data.get((cnt)/2) + (double)data.get((cnt/2)+1)) / 2;
+                    ((double) data.get((cnt) / 2) + (double) data.get((cnt / 2) + 1)) / 2;
             median.setText(Double.toString(med));
         }
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 5;
-        //mean.setBounds(500,550,200, 30);
-        add(median, constraints);
+        median.setBounds(120, 250, 200, 30);
+        add(median);
 
         int result = findMode(data);
 
         mode.setText(Integer.toString(result));
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 3;
-        constraints.gridy = 6;
-        //mean.setBounds(500,550,200, 30);
-        add(mode, constraints);
+        mode.setBounds(120, 300, 200, 30);
+        add(mode);
     }
 
-    private int findMode(List<Integer> fileData)
-    {
-        HashMap<Integer,Integer> hashMap = new HashMap<>();
-        int max  = 1;
+    public void update(){
+        data = MainPage.getFileData();
+
+        int max = Integer.MIN_VALUE;
+        int min = Integer.MAX_VALUE;
+
+        for (Integer i : data) {
+            if (max < i)
+                max = i;
+            if (min > i)
+                min = i;
+        }
+
+        int sum = 0;
+        int cnt = 0;
+        for (Integer i : data) {
+            sum = sum + i;
+            cnt += 1;
+        }
+
+        count.setText(Integer.toString(cnt));
+        high.setText(Integer.toString(max));
+        low.setText(Integer.toString(min));
+        mean.setText(Integer.toString(sum / cnt));
+        //Median
+        if (cnt % 2 != 0) {
+            median.setText(Integer.toString(data.get(cnt / 2)));
+        } else {
+            double med =
+                    ((double) data.get((cnt) / 2) + (double) data.get((cnt / 2) + 1)) / 2;
+            median.setText(Double.toString(med));
+        }
+
+        //Mode
+        int result = findMode(data);
+        mode.setText(Integer.toString(result));
+    }
+
+    private int findMode(List<Integer> fileData) {
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        int max = 1;
         int mode = 0;
 
         for (Integer fileDatum : fileData) {

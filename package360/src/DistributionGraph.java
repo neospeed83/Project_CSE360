@@ -18,7 +18,6 @@ class DistributionGraph extends JPanel {
 
     //Graph needs to resize to fit panel
     private void InitUI() {
-
         List<Float> fileData = MainPage.getFileData();
 
         // Calculate minimum and maximum value of dataset:
@@ -33,10 +32,6 @@ class DistributionGraph extends JPanel {
                 min1 = i;
             }
         }
-
-        //Placeholder values
-        min1 = 0;
-        max1 = 100;
 
         int first = 0, second = 0, third = 0, fourth = 0, fifth = 0,
                 sixth = 0, seventh = 0, eighth = 0, ninth = 0, tenth = 0;
@@ -149,6 +144,7 @@ class DistributionGraph extends JPanel {
         // Set new dataset
     }
 
+    //Need to change
     void updateGraph() {
         this.InitUI();
     }

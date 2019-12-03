@@ -16,6 +16,8 @@ class SetBoundary {
             SetBoundary.setLowerBound(low);
             SetBoundary.setHigherBound(high);
         }
+
+        MainPage.updateReport("Set Bounds to: " + low + ", " + high + "\n");
     }
 
     static float getLowerBound() {

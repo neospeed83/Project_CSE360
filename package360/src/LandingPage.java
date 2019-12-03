@@ -6,7 +6,6 @@ import javax.swing.filechooser.FileSystemView;
 public class LandingPage extends JFrame {
 
     private static boolean errorFlag = false;
-    private static boolean defaultBounds = true;
 
     private LandingPage() {
         //set default bounds 0, 100
@@ -71,7 +70,6 @@ public class LandingPage extends JFrame {
                     MainPage.boundaryFlag = true;
                     boundSet.setVisible(true);
                     emptyBounds.setVisible(false);
-                    defaultBounds = false;
 
                 } catch (NumberFormatException ex5) {
                     JOptionPane.showMessageDialog(this,
@@ -87,7 +85,7 @@ public class LandingPage extends JFrame {
 
 
         //browse button
-        JButton browseButton = new JButton("load a file");
+        JButton browseButton = new JButton("Load a file");
         add(browseButton);
         browseButton.setBounds(20, 200, 100, 30);
         browseButton.addActionListener(e -> {
@@ -111,11 +109,9 @@ public class LandingPage extends JFrame {
                             JOptionPane.ERROR_MESSAGE);
                 }
 
-                if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
+                if (jfc.getSelectedFile().exists() && returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
-                        //Check if default bounds are needed
-                        if(defaultBounds)
-                            SetBoundary.updateBoundaries(0, 100);
+                        MainPage.boundaryFlag = true;
                         new MainPage(jfc.getSelectedFile());
                         //setEnabled(false);
                     } catch (Exception ex) {

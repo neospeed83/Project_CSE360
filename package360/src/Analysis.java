@@ -10,6 +10,7 @@ class Analysis extends JPanel {
 
     Analysis() {
         data = MainPage.getFileData();
+        data.sort(null);
         count = new JTextField();
         count.setEditable(false);
         mean = new JTextField();
@@ -82,14 +83,14 @@ class Analysis extends JPanel {
         }
 
         float sum = 0;
-        float cnt = 0;
+        int cnt = 0;
         for (Float i : data) {
             sum = sum + i;
             cnt += 1;
         }
 
 
-        count.setText(Float.toString(cnt));
+        count.setText(Integer.toString(cnt));
         count.setBounds(120, 50, 200, 30);
         add(count);
 
@@ -106,13 +107,15 @@ class Analysis extends JPanel {
         add(mean);
 
 
-        //Median, needs to be looked at
+        //Median
+        int mid = cnt / 2;
         if (cnt % 2 != 0) {
-            median.setText(String.format("%.2f", (cnt / 2)));
+            //Take middle number
+            median.setText(String.format("%.2f", data.get(mid)));
         } else {
-            float med =
-                    (float) (((double) data.get((int) ((cnt) / 2)) + (double) data.get((int) ((cnt / 2) + 1))) / 2);
-            median.setText(String.format("%.2f", med));
+            //Add middle two numbers and divide by 2
+            float medianVal = (data.get(mid) + data.get(mid-1)) / 2;
+            median.setText(String.format("%.2f", medianVal));
         }
 
         median.setBounds(120, 250, 200, 30);
@@ -150,13 +153,16 @@ class Analysis extends JPanel {
         high.setText(Float.toString(max));
         low.setText(Float.toString(min));
         mean.setText(String.format("%.2f", sum / cnt));
+
         //Median, needs to be looked at
+        int mid = cnt / 2;
         if (cnt % 2 != 0) {
-            median.setText(String.format("%.2f", (float) cnt / 2));
+            //Take middle number
+            median.setText(String.format("%.2f", data.get(mid)));
         } else {
-            double med =
-                    ((double) data.get((cnt) / 2) + (double) data.get((cnt / 2) + 1)) / 2;
-            median.setText(String.format("%.2f", med));
+            //Add middle two numbers and divide by 2
+            float medianVal = (data.get(mid) + data.get(mid-1)) / 2;
+            median.setText(String.format("%.2f", medianVal));
         }
 
         //Mode

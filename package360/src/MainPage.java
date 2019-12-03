@@ -12,13 +12,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 
 class MainPage extends JDialog {
 
     private File selectedFile;
-    private static List<Integer> fileData;
+    private static List<Float> fileData;
     private DefaultCategoryDataset dataset;
     private static DefaultCategoryDataset distributionDataset;
     //Flags
@@ -31,7 +32,7 @@ class MainPage extends JDialog {
         InitMainUI();
     }
 
-    static List<Integer> getFileData() {
+    static List<Float> getFileData() {
         return fileData;
     }
 
@@ -50,7 +51,7 @@ class MainPage extends JDialog {
 
         // Load file fileData into -> fileData
         fileData = ReadFile.readFileByName(selectedFile.getPath());
-        for (Integer i : fileData) {
+        for (Float i : fileData) {
             int higher = i.compareTo(SetBoundary.getHigherBound());
             int lower = i.compareTo(SetBoundary.getLowerBound());
             if (higher > 0 || lower < 0) {
@@ -92,11 +93,11 @@ class MainPage extends JDialog {
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
-                        List<Integer> append =
+                        List<Float> append =
                                 ReadFile.readFileByName(jfc.getSelectedFile().getPath());
-                        for (Integer i : append) {
-                            int higher = i.compareTo(SetBoundary.getHigherBound());
-                            int lower = i.compareTo(SetBoundary.getLowerBound());
+                        for (Float i : append) {
+                            float higher = i.compareTo(SetBoundary.getHigherBound());
+                            float lower = i.compareTo(SetBoundary.getLowerBound());
                             if (higher > 0 || lower < 0) {
                                 boundaryFlag = false;
                                 break;
@@ -141,10 +142,11 @@ class MainPage extends JDialog {
             display.setBounds(20, 150, 150, 30);
             add(display);
 
+            //Needs to display in 4 columns with descending order
             display.addActionListener(e -> {
                 displayData.setText("");
                 fileData.sort(null);
-                for (Integer element : fileData) {
+                for (Float element : fileData) {
                     displayData.append(element + " ");
                 }
                 displayData.setVisible(true);
@@ -157,10 +159,10 @@ class MainPage extends JDialog {
             add(displayGraph);
 
             // Calculate minimum and maximum value of dataset:
-            int max = Integer.MIN_VALUE;
-            int min = Integer.MAX_VALUE;
+            float max = Integer.MIN_VALUE;
+            float min = Integer.MAX_VALUE;
 
-            for (Integer i : fileData) {
+            for (Float i : fileData) {
                 if (max < i) {
                     max = i;
                 }
@@ -169,10 +171,13 @@ class MainPage extends JDialog {
                 }
             }
 
+            max = 100;
+            min = 0;
+
             int one = 0, two = 0, three = 0, four = 0, five = 0, six = 0,
                     seven = 0, eight = 0, nine = 0, ten = 0;
 
-            for (Integer i : fileData) {
+            for (Float i : fileData) {
                 if (i <= (min + max) * 0.1)
                     one += 1;
                 else if (i > (min + max) * 0.1 && i <= (min + max) * 0.2)
@@ -226,10 +231,10 @@ class MainPage extends JDialog {
             // Update Graph
             displayGraph.addActionListener(e -> {
                 // Calculate minimum and maximum value of dataset:
-                int max1 = Integer.MIN_VALUE;
-                int min1 = Integer.MAX_VALUE;
+                float max1 = Integer.MIN_VALUE;
+                float min1 = Integer.MAX_VALUE;
 
-                for (Integer i : fileData) {
+                for (Float i : fileData) {
                     if (max1 < i) {
                         max1 = i;
                     }
@@ -237,11 +242,13 @@ class MainPage extends JDialog {
                         min1 = i;
                     }
                 }
+                max1 = 100;
+                min1 = 0;
 
                 int first = 0, second = 0, third = 0, fourth = 0, fifth = 0,
                         sixth = 0, seventh = 0, eighth = 0, ninth = 0, tenth = 0;
 
-                for (Integer i : fileData) {
+                for (Float i : fileData) {
                     if (i <= (min1 + max1) * 0.1)
                         first += 1;
                     else if (i > (min1 + max1) * 0.1 && i <= (min1 + max1) * 0.2)
@@ -317,5 +324,3 @@ class MainPage extends JDialog {
         } // else Display main page
     }// End Init ui
 }
-
-

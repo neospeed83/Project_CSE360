@@ -6,7 +6,7 @@ import java.util.List;
 class Analysis extends JPanel {
 
     private JTextField count, high, low, mean, median, mode;
-    private List<Integer> data;
+    private List<Float> data;
 
     Analysis() {
         data = MainPage.getFileData();
@@ -71,48 +71,48 @@ class Analysis extends JPanel {
 
         // TextFields and Calculations
 
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
+        float max = Integer.MIN_VALUE;
+        float min = Integer.MAX_VALUE;
 
-        for (Integer i : data) {
+        for (Float i : data) {
             if (max < i)
                 max = i;
             if (min > i)
                 min = i;
         }
 
-        int sum = 0;
-        int cnt = 0;
-        for (Integer i : data) {
+        float sum = 0;
+        float cnt = 0;
+        for (Float i : data) {
             sum = sum + i;
             cnt += 1;
         }
 
 
-        count.setText(Integer.toString(cnt));
+        count.setText(Float.toString(cnt));
         count.setBounds(120, 50, 200, 30);
         add(count);
 
-        high.setText(Integer.toString(max));
+        high.setText(Float.toString(max));
         high.setBounds(120, 100, 200, 30);
         add(high);
 
-        low.setText(Integer.toString(min));
+        low.setText(Float.toString(min));
         low.setBounds(120, 150, 200, 30);
         add(low);
 
-        mean.setText(Integer.toString(sum / cnt));
+        mean.setText(String.format("%.2f", sum / cnt));
         mean.setBounds(120, 200, 200, 30);
         add(mean);
 
 
-        //Median
+        //Median, needs to be looked at
         if (cnt % 2 != 0) {
-            median.setText(Integer.toString(data.get(cnt / 2)));
+            median.setText(String.format("%.2f", (cnt / 2)));
         } else {
-            double med =
-                    ((double) data.get((cnt) / 2) + (double) data.get((cnt / 2) + 1)) / 2;
-            median.setText(Double.toString(med));
+            float med =
+                    (float) (((double) data.get((int) ((cnt) / 2)) + (double) data.get((int) ((cnt / 2) + 1))) / 2);
+            median.setText(String.format("%.2f", med));
         }
 
         median.setBounds(120, 250, 200, 30);
@@ -128,34 +128,35 @@ class Analysis extends JPanel {
     public void update(){
         data = MainPage.getFileData();
 
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
+        float max = Integer.MIN_VALUE;
+        float min = Integer.MAX_VALUE;
 
-        for (Integer i : data) {
+        for (Float i : data) {
             if (max < i)
                 max = i;
             if (min > i)
                 min = i;
         }
 
-        int sum = 0;
+        float sum = 0;
         int cnt = 0;
-        for (Integer i : data) {
+        for (Float i : data) {
             sum = sum + i;
             cnt += 1;
         }
 
+
         count.setText(Integer.toString(cnt));
-        high.setText(Integer.toString(max));
-        low.setText(Integer.toString(min));
-        mean.setText(Integer.toString(sum / cnt));
-        //Median
+        high.setText(Float.toString(max));
+        low.setText(Float.toString(min));
+        mean.setText(String.format("%.2f", sum / cnt));
+        //Median, needs to be looked at
         if (cnt % 2 != 0) {
-            median.setText(Integer.toString(data.get(cnt / 2)));
+            median.setText(String.format("%.2f", (float) cnt / 2));
         } else {
             double med =
                     ((double) data.get((cnt) / 2) + (double) data.get((cnt / 2) + 1)) / 2;
-            median.setText(Double.toString(med));
+            median.setText(String.format("%.2f", med));
         }
 
         //Mode
@@ -163,12 +164,12 @@ class Analysis extends JPanel {
         mode.setText(Integer.toString(result));
     }
 
-    private int findMode(List<Integer> fileData) {
-        HashMap<Integer, Integer> hashMap = new HashMap<>();
+    private int findMode(List<Float> fileData) {
+        HashMap<Float, Integer> hashMap = new HashMap<>();
         int max = 1;
-        int mode = 0;
+        float mode = 0;
 
-        for (Integer fileDatum : fileData) {
+        for (Float fileDatum : fileData) {
             if (hashMap.get(fileDatum) != null) { // Already found element
                 int count = hashMap.get(fileDatum);
                 count++;
@@ -181,6 +182,6 @@ class Analysis extends JPanel {
             } else // Newly found element
                 hashMap.put(fileDatum, 1);
         }
-        return mode;
+        return (int) mode;
     }
 }

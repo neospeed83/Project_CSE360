@@ -6,11 +6,11 @@ import javax.swing.filechooser.FileSystemView;
 public class LandingPage extends JFrame {
 
     private static boolean errorFlag = false;
-
+    private static boolean defaultBounds = true;
 
     private LandingPage() {
-        //set default bounds 0, 9999
-        SetBoundary.updateBoundaries(0, 9999);
+        //set default bounds 0, 100
+        SetBoundary.updateBoundaries(0, 100);
         initUI();
     }
 
@@ -30,7 +30,7 @@ public class LandingPage extends JFrame {
         JTextField tfLower = new JTextField(50);
         lowerBound.setLabelFor(tfLower);
         setLayout(null);
-        tfLower.setText(Integer.toString(SetBoundary.getLowerBound()));
+        tfLower.setText(Float.toString(SetBoundary.getLowerBound()));
         add(lowerBound);
         add(tfLower);
         lowerBound.setBounds(20, 100, 120, 30);
@@ -39,7 +39,7 @@ public class LandingPage extends JFrame {
         JLabel upperBound = new JLabel("Upper bound");
         JTextField tfUpper = new JTextField(50);
         upperBound.setLabelFor(tfUpper);
-        tfUpper.setText(Integer.toString(SetBoundary.getHigherBound()));
+        tfUpper.setText(Float.toString(SetBoundary.getHigherBound()));
         add(upperBound);
         add(tfUpper);
         upperBound.setBounds(320, 100, 120, 30);
@@ -65,12 +65,13 @@ public class LandingPage extends JFrame {
             if (!tfLower.getText().isEmpty() && !tfUpper.getText().isEmpty()) {
 
                 try {
-                    int low = Integer.parseInt(tfLower.getText());
-                    int high = Integer.parseInt(tfUpper.getText());
+                    float low = Float.parseFloat(tfLower.getText());
+                    float high = Float.parseFloat(tfUpper.getText());
                     SetBoundary.updateBoundaries(low, high);
                     MainPage.boundaryFlag = true;
                     boundSet.setVisible(true);
                     emptyBounds.setVisible(false);
+                    defaultBounds = false;
 
                 } catch (NumberFormatException ex5) {
                     JOptionPane.showMessageDialog(this,
@@ -112,6 +113,9 @@ public class LandingPage extends JFrame {
 
                 if (!errorFlag && returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
+                        //Check if default bounds are needed
+                        if(defaultBounds)
+                            SetBoundary.updateBoundaries(0, 100);
                         new MainPage(jfc.getSelectedFile());
                         //setEnabled(false);
                     } catch (Exception ex) {

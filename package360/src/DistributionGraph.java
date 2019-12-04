@@ -21,17 +21,8 @@ class DistributionGraph extends JPanel {
         List<Float> fileData = MainPage.getFileData();
 
         // Calculate minimum and maximum value of dataset:
-        float max1 = Integer.MIN_VALUE;
-        float min1 = Integer.MAX_VALUE;
-
-        for (Float i : fileData) {
-            if (max1 < i) {
-                max1 = i;
-            }
-            if (min1 > i) {
-                min1 = i;
-            }
-        }
+        float max1 = SetBoundary.getHigherBound();
+        float min1 = SetBoundary.getLowerBound();
 
         int first = 0, second = 0, third = 0, fourth = 0, fifth = 0,
                 sixth = 0, seventh = 0, eighth = 0, ninth = 0, tenth = 0;
@@ -144,7 +135,7 @@ class DistributionGraph extends JPanel {
         // Set new dataset
     }
 
-    //Need to change
+    //Needs to change
     void updateGraph() {
         this.InitUI();
     }

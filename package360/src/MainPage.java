@@ -247,7 +247,7 @@ class MainPage extends JDialog {
             //Create Report Button
             JButton createReport = new JButton("Create Report");
             add(createReport);
-            createReport.setBounds(1000, 50, 150, 30);
+            createReport.setBounds(1100, 50, 125, 30);
             createReport.addActionListener(e -> {
                 File report = new File("report.txt");
                 try {
@@ -278,16 +278,14 @@ class MainPage extends JDialog {
             });
 
             // Display TextArea
-            JTextArea displayData = new JTextArea();
+            JTextArea displayData = new JTextArea(4, 2);
             displayData.setEditable(false);
             displayData.setBounds(20, 150, 700, 450);
             displayData.setLineWrap(true);
             displayData.setVisible(false);
             displayData.setText("");
             fileData.sort(null);
-            for (Float element : fileData) {
-                displayData.append(element + " ");
-            }
+            updateDisplay(displayData);
             displayData.setVisible(true);
             add(displayData);
 
@@ -321,17 +319,8 @@ class MainPage extends JDialog {
             add(displayGraph);
 
             // Calculate minimum and maximum value of dataset:
-            float max = Integer.MIN_VALUE;
-            float min = Integer.MAX_VALUE;
-
-            for (Float i : fileData) {
-                if (max < i) {
-                    max = i;
-                }
-                if (min > i) {
-                    min = i;
-                }
-            }
+            float max = SetBoundary.getHigherBound();
+            float min = SetBoundary.getLowerBound();
 
             int one = 0, two = 0, three = 0, four = 0, five = 0, six = 0,
                     seven = 0, eight = 0, nine = 0, ten = 0;
@@ -456,17 +445,8 @@ class MainPage extends JDialog {
 
     //Function for updating display graph
     private void updateDisplayGraph(CategoryPlot catPlot) {
-        float max1 = Integer.MIN_VALUE;
-        float min1 = Integer.MAX_VALUE;
-
-        for (Float i : fileData) {
-            if (max1 < i) {
-                max1 = i;
-            }
-            if (min1 > i) {
-                min1 = i;
-            }
-        }
+        float max1 = SetBoundary.getHigherBound();
+        float min1 = SetBoundary.getLowerBound();
 
         int first = 0, second = 0, third = 0, fourth = 0, fifth = 0,
                 sixth = 0, seventh = 0, eighth = 0, ninth = 0, tenth = 0;
@@ -513,10 +493,63 @@ class MainPage extends JDialog {
 
     //Function for updating display data
     private void updateDisplay(JTextArea displayData) {
+        //Wipe the previous text data
         displayData.setText("");
         fileData.sort(null);
-        for (Float element : fileData) {
-            displayData.append(element + " ");
+
+        //Making buckets to hold "column" data in descending order
+        int count = 0; for(Float element : fileData) { count++; }
+        int bucketCapacity = count / 4;
+        int bucketOverflow = count % 4;
+        int bucketLevel1 = 0, bucketLevel2 = 0, bucketLevel3 = 0;
+        String bucket1 = "", bucket2 = "", bucket3 = "", bucket4 = "";
+
+        //Fill buckets to their capacity, any overflow goes into the first bucket
+        for (int i = count-1; i >= 0; i--) {
+            if(bucketLevel1 < (bucketCapacity+bucketOverflow)) {
+                bucket1 += (fileData.get(i) + ",");
+                bucketLevel1++;
+            }
+            else if(bucketLevel2 < bucketCapacity) {
+                bucket2 += (fileData.get(i) + ",");
+                bucketLevel2++;
+            }
+            else if(bucketLevel3 < bucketCapacity) {
+                bucket3 += (fileData.get(i) +",");
+                bucketLevel3++;
+            }
+            else {
+                bucket4 += (fileData.get(i) +",");
+            }
+        }
+
+        //Empty buckets into arrays so the individual strings can be printed
+        String emptiedBucket1[] = bucket1.split(",");
+        String emptiedBucket2[] = bucket2.split(",");
+        String emptiedBucket3[] = bucket3.split(",");
+        String emptiedBucket4[] = bucket4.split(",");
+
+        //Print the bucket contents in descending order with 4 columns
+        for(int i = 0; i < (bucketCapacity+bucketOverflow); i++) {
+            String padded = "";
+            if(i < emptiedBucket1.length) {
+                padded = String.format("%-30s", emptiedBucket1[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket2.length) {
+                padded = String.format("%-30s", emptiedBucket2[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket3.length) {
+                padded = String.format("%-30s", emptiedBucket3[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket4.length) {
+                padded = String.format("%-30s", emptiedBucket4[i]);
+                displayData.append(padded);
+            }
+
+            displayData.append("\n");
         }
         displayData.setVisible(true);
     }

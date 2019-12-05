@@ -116,6 +116,54 @@ class MainPage extends JDialog {
                 }
             });
 
+            //Input label and text field
+            JLabel inputLabel = new JLabel("Input");
+            JTextField inputData = new JTextField(50);
+            inputLabel.setLabelFor(inputData);
+            inputData.setBounds(50, 90, 40, 30);
+            inputLabel.setBounds(20, 90, 60, 30);
+            inputData.setVisible(true);
+            add(inputData);
+            add(inputLabel);
+
+            //Submitted text field
+            JLabel sentValue = new JLabel("Submitted");
+            sentValue.setBounds(180,90,60,30);
+            sentValue.setVisible(false);
+            add(sentValue);
+
+            //empty inpput text field
+            JLabel emptyValue = new JLabel("Empty Input");
+            emptyValue.setBounds(180,90,80,30);
+            emptyValue.setVisible(false);
+            add(emptyValue);
+
+                //submit button
+            JButton submitValue = new JButton("Submit");
+            submitValue.setBounds(90,90,80,30);
+            submitValue.setVisible(true);
+            add(submitValue);
+            submitValue.addActionListener(e -> {
+                if (!inputData.getText().isEmpty()) { //catching empty input
+
+                    try {
+                        int value = Integer.parseInt(inputData.getText());
+                        sentValue.setVisible(true);
+                        emptyValue.setVisible(false);
+                        fileData.add(value);
+
+                    } catch (NumberFormatException ex5) {
+                        JOptionPane.showMessageDialog(this,
+                                "Please enter a number",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    emptyValue.setVisible(true);
+                    sentValue.setVisible(false);
+                }
+            });
+
             // Display TextArea
             JTextArea displayData = new JTextArea();
             displayData.setEditable(false);
@@ -127,7 +175,6 @@ class MainPage extends JDialog {
 
             // Declaring Tabbed pane here to change active tab on button click
             JTabbedPane tabbedPane = new JTabbedPane();
-
 
             // Refresh Section Label
             JLabel refreshSection = new JLabel("Refresh:");

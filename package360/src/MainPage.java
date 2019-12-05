@@ -164,6 +164,64 @@ class MainPage extends JDialog {
                 }
             });
 
+            //Remove section
+            JLabel deleteSection = new JLabel("Remove:");
+            deleteSection.setFont(
+                    new Font("Serif", Font.BOLD, 18));
+            deleteSection.setBounds(200, 20, 120, 30);
+            add(deleteSection);
+
+            //Delete label and text field
+            JLabel deleteLabel = new JLabel("Delete");
+            JTextField deleteData = new JTextField(50);
+            deleteLabel.setLabelFor(deleteData);
+            deleteData.setBounds(240, 50, 40, 30);
+            deleteLabel.setBounds(200, 50, 60, 30);
+            deleteData.setVisible(true);
+            add(deleteData);
+            add(deleteLabel);
+
+            //Submitted text field
+            JLabel deletedValue = new JLabel("Submitted");
+            deletedValue.setBounds(370,50,60,30);
+            deletedValue.setVisible(false);
+            add(deletedValue);
+
+            //empty input text field
+            JLabel emptyDValue = new JLabel("Empty Input");
+            emptyDValue.setBounds(370,50,80,30);
+            emptyDValue.setVisible(false);
+            add(emptyDValue);
+
+            //submit button
+            JButton submitDValue = new JButton("Submit");
+            submitDValue.setBounds(280,50,80,30);
+            submitDValue.setVisible(true);
+            add(submitDValue);
+            submitDValue.addActionListener(e -> {
+                if (!deleteData.getText().isEmpty()) { //catching empty input
+
+                    try {
+                        int value = Integer.parseInt(deleteData.getText());
+                        deletedValue.setVisible(true);
+                        emptyDValue.setVisible(false);
+                        fileData.remove(Integer.valueOf(value));
+
+                    } catch (NumberFormatException ex5) {
+                        JOptionPane.showMessageDialog(this,
+                                "Please enter a number",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    emptyDValue.setVisible(true);
+                    deletedValue.setVisible(false);
+                }
+            });
+
+
+
+
             // Display TextArea
             JTextArea displayData = new JTextArea();
             displayData.setEditable(false);

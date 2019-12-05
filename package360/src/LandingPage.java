@@ -124,7 +124,7 @@ public class LandingPage extends JFrame {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            var ex = new LandingPage();
+            LandingPage ex = new LandingPage();
             ex.setVisible(true);
         });
     }

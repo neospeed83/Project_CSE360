@@ -39,6 +39,7 @@ class ReadFile {
                     "Please check your file name",
                     "File Does not exist!",
                     JOptionPane.ERROR_MESSAGE);
+            MainPage.errorFlag = true;
             LandingPage.setErrorFlag();
             log.addError(0);
         } catch (NumberFormatException e) {

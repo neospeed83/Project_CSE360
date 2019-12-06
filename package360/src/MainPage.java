@@ -8,21 +8,30 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 
 class MainPage extends JDialog {
 
     private File selectedFile;
-    private static List<Integer> fileData;
+    private static List<Float> fileData;
     private DefaultCategoryDataset dataset;
     private static DefaultCategoryDataset distributionDataset;
     //Flags
     static boolean boundaryFlag = true;
+    static boolean reportFlag = false;
+    static boolean refreshSwitch = false;
+
+    private static String reportContent = "";
 
     MainPage(File inputFile) {
         selectedFile = inputFile;
@@ -31,7 +40,7 @@ class MainPage extends JDialog {
         InitMainUI();
     }
 
-    static List<Integer> getFileData() {
+    static List<Float> getFileData() {
         return fileData;
     }
 
@@ -47,10 +56,12 @@ class MainPage extends JDialog {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        //create error log
+        ErrorLog log = ErrorLog.getInstance();
 
         // Load file fileData into -> fileData
         fileData = ReadFile.readFileByName(selectedFile.getPath());
-        for (Integer i : fileData) {
+        for (Float i : fileData) {
             int higher = i.compareTo(SetBoundary.getHigherBound());
             int lower = i.compareTo(SetBoundary.getLowerBound());
             if (higher > 0 || lower < 0) {
@@ -65,9 +76,13 @@ class MainPage extends JDialog {
                     "The file contains out of bounds data!",
                     "Data Boundary Error",
                     JOptionPane.ERROR_MESSAGE);
+            log.addError(1);
+            MainPage.updateReport("Unsuccessfully loaded program with the file: " + selectedFile + "\n");
         } else {
             // Display Main Page
             setVisible(true);
+            MainPage.updateReport("New Data Set - Successfully loaded program with the file: "
+                    + selectedFile + "\n");
 
             // "Add" Section Label
             JLabel addSection = new JLabel("Add:");
@@ -92,11 +107,56 @@ class MainPage extends JDialog {
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
-                        List<Integer> append =
+                        List<Float> append =
                                 ReadFile.readFileByName(jfc.getSelectedFile().getPath());
-                        for (Integer i : append) {
-                            int higher = i.compareTo(SetBoundary.getHigherBound());
-                            int lower = i.compareTo(SetBoundary.getLowerBound());
+                        for (Float i : append) {
+                            float higher = i.compareTo(SetBoundary.getHigherBound());
+                            float lower = i.compareTo(SetBoundary.getLowerBound());
+                            if (higher > 0 || lower < 0) {
+                                boundaryFlag = false;
+                                break;
+                            }
+                        }
+                        if (!boundaryFlag) {
+                            MainPage.updateReport("Unsuccessfully appended program with the file: "
+                                    + jfc.getSelectedFile() + "\n");
+                            JOptionPane.showMessageDialog(jfc,
+                                    "The file contains out of bounds data!",
+                                    "Data Boundary Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
+                        } else {
+                            fileData.addAll(append); // Append to fileData
+                            MainPage.updateReport("Successfully appended program with the file: "
+                                    + jfc.getSelectedFile() + "\n");
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+
+            // Load button
+            JButton loadFile = new JButton("Load another file");
+            add(loadFile);
+            loadFile.setBounds(20, 90, 150, 30);
+            loadFile.addActionListener(e -> {
+                JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+                jfc.setDialogTitle("Select a csv or txt to load");
+                jfc.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter filter =
+                        new FileNameExtensionFilter("txt or csv files", "csv",
+                                "txt");
+                jfc.addChoosableFileFilter(filter);
+                int returnValue = jfc.showOpenDialog(null);
+
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        List<Float> load =
+                                ReadFile.readFileByName(jfc.getSelectedFile().getPath());
+                        for (Float i : load) {
+                            float higher = i.compareTo(SetBoundary.getHigherBound());
+                            float lower = i.compareTo(SetBoundary.getLowerBound());
                             if (higher > 0 || lower < 0) {
                                 boundaryFlag = false;
                                 break;
@@ -107,12 +167,281 @@ class MainPage extends JDialog {
                                     "The file contains out of bounds data!",
                                     "Data Boundary Error",
                                     JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
+                            MainPage.updateReport("Unsuccessfully loaded program with the file: "
+                                    + jfc.getSelectedFile() + "\n");
                         } else {
-                            fileData.addAll(append); // Append to fileData
+                            fileData = load; // Load to fileData
+                            MainPage.updateReport("\nNew Data Set - Successfully loaded program with the file: "
+                                    + jfc.getSelectedFile() + "\n");
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
+                }
+            });
+
+            Analysis analysisPanel = new Analysis();
+            DistributionGraph distribution = new DistributionGraph();
+
+            //set boundaries for the main page
+            JLabel lowerBound = new JLabel("Lower bound");
+            JTextField tfLower = new JTextField(50);
+            lowerBound.setLabelFor(tfLower);
+            setLayout(null);
+            tfLower.setText(Float.toString(SetBoundary.getLowerBound()));
+            add(lowerBound);
+            add(tfLower);
+            lowerBound.setBounds(500, 20, 120, 30);
+            tfLower.setBounds(500, 50, 50, 30);
+
+            JLabel upperBound = new JLabel("Upper bound");
+            JTextField tfUpper = new JTextField(50);
+            upperBound.setLabelFor(tfUpper);
+            tfUpper.setText(Float.toString(SetBoundary.getHigherBound()));
+            add(upperBound);
+            add(tfUpper);
+            upperBound.setBounds(600, 20, 120, 30);
+            tfUpper.setBounds(600, 50, 50, 30);
+
+            // Error: Bounds can't be empty
+            JLabel emptyBounds = new JLabel("Upper / Lower Bound can't be empty");
+            emptyBounds.setBounds(370, 30, 300, 30);
+            add(emptyBounds);
+            emptyBounds.setVisible(false);
+
+            //set button for the main page
+            JButton setBoundaries = new JButton("Set Bounds");
+            setBoundaries.setBounds(700, 50, 120, 30);
+            add(setBoundaries);
+            setBoundaries.addActionListener(e -> {
+                if (!tfLower.getText().isEmpty() && !tfUpper.getText().isEmpty()) {
+                    try {
+                        boolean canUpdateBounds = true;
+                        float low = Float.parseFloat(tfLower.getText());
+                        float high = Float.parseFloat(tfUpper.getText());
+
+                        for (Float i : fileData) {
+                            if (canUpdateBounds && (i < low || i > high)) {
+                                canUpdateBounds = false;
+                                boundaryFlag = false;
+                                JOptionPane.showMessageDialog(this,
+                                        "The file contains out of bounds data!",
+                                        "Data Boundary Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                                log.addError(1);
+                                updateReport("Unsuccessfully set bounds to: " + low + ", " + high + "\n");
+                            }
+                        }
+                        if(canUpdateBounds) {
+                            SetBoundary.updateBoundaries(low, high);
+                            distribution.update();
+                            analysisPanel.update();
+                            boundaryFlag = true;
+                            JOptionPane.showMessageDialog(this,
+                                    "Bounds set successfully",
+                                    "Boundaries Set",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (NumberFormatException ex5) {
+                        JOptionPane.showMessageDialog(this,
+                                "Please enter a number",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                        log.addError(2);
+                        updateReport("Unsuccessfully set bounds \n");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Upper / lower bounds can't be empty",
+                            "Empty Bounds",
+                            JOptionPane.ERROR_MESSAGE);
+                    log.addError(1);
+                    updateReport("Unsuccessfully set bounds \n");
+                }
+            });
+
+            //Create Report Button
+            JButton createReport = new JButton("Create Report");
+            add(createReport);
+            createReport.setBounds(1100, 50, 125, 30);
+            createReport.addActionListener(e -> {
+                File report = new File("report.txt");
+                try {
+                    if(report.createNewFile()) {
+                        FileWriter fw = new FileWriter(report, true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        bw.write("Created Report:\n\n");
+                        bw.write(reportContent);
+                        reportContent = "";
+                        bw.close();
+
+                        reportFlag = true;
+                    }
+                    else {
+                        FileWriter fw = new FileWriter(report, true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        if(!reportFlag)
+                            bw.write("\nNew Program Instance\n");
+                        bw.write(reportContent);
+                        reportContent = "";
+                        bw.close();
+
+                        reportFlag = true;
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            //Display Error Log Button
+            JButton errorLog = new JButton("Error Log");
+            add(errorLog);
+            errorLog.setBounds(1100, 100, 125, 30);
+            errorLog.addActionListener(e -> {
+                if(log.isEmpty())
+                {
+                    JOptionPane.showMessageDialog(null,"Error Log is empty.");
+                } else {
+                    JOptionPane.showMessageDialog(null, log.getReport());
+                }
+            });
+
+
+            //Add button - Nick
+            //Input label and text field
+            JLabel inputLabel = new JLabel("Input");
+            JTextField inputData = new JTextField(50);
+            inputLabel.setLabelFor(inputData);
+            inputData.setBounds(50, 130, 40, 30);
+            inputLabel.setBounds(20, 130, 60, 30);
+            inputData.setVisible(true);
+            add(inputData);
+            add(inputLabel);
+
+            //Submitted text field
+            JLabel sentValue = new JLabel("Submitted");
+            sentValue.setBounds(180,130,60,30);
+            sentValue.setVisible(false);
+            add(sentValue);
+
+            //empty input text field
+            JLabel emptyValue = new JLabel("Empty Input");
+            emptyValue.setBounds(180,130,80,30);
+            emptyValue.setVisible(false);
+            add(emptyValue);
+
+            //submit button
+            JButton submitValue = new JButton("Submit");
+            submitValue.setBounds(90,130,80,30);
+            submitValue.setVisible(true);
+            add(submitValue);
+            submitValue.addActionListener(e -> {
+                emptyValue.setVisible(false);
+                sentValue.setVisible(false);
+                if (!inputData.getText().isEmpty()) { //catching empty input
+                    try {
+                        float value = Float.parseFloat(inputData.getText());
+                        float hB = SetBoundary.getHigherBound();
+                        float lB = SetBoundary.getLowerBound();
+                        sentValue.setVisible(true);
+                        emptyValue.setVisible(false);
+
+                        if(value >= lB && value <= hB) {
+                            fileData.add(value);
+                            updateReport("Successfully added keyboard input: " + value + "\n");
+                        }
+                        else {
+                            updateReport("Unsuccessfully added keyboard input: " + value + "\n");
+                            JOptionPane.showMessageDialog(this,
+                                    "Value is out of bounds",
+                                    "Out of Bounds",
+                                    JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
+                        }
+
+                    } catch (NumberFormatException ex5) {
+                        JOptionPane.showMessageDialog(this,
+                                "Please enter a number",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                        updateReport("Unsuccessfully added keyboard input\n");
+                        log.addError(2);
+                    }
+                } else {
+                    emptyValue.setVisible(true);
+                    sentValue.setVisible(false);
+                    updateReport("Unsuccessfully added keyboard input\n");
+                }
+            });
+
+            //Delete Button - Nick
+            //Remove section
+            JLabel deleteSection = new JLabel("Remove:");
+            deleteSection.setFont(
+                    new Font("Serif", Font.BOLD, 18));
+            deleteSection.setBounds(200, 20, 120, 30);
+            add(deleteSection);
+
+            //Delete label and text field
+            JLabel deleteLabel = new JLabel("Delete");
+            JTextField deleteData = new JTextField(50);
+            deleteLabel.setLabelFor(deleteData);
+            deleteData.setBounds(240, 50, 40, 30);
+            deleteLabel.setBounds(200, 50, 60, 30);
+            deleteData.setVisible(true);
+            add(deleteData);
+            add(deleteLabel);
+
+            //Submitted text field
+            JLabel deletedValue = new JLabel("Submitted");
+            deletedValue.setBounds(370,50,60,30);
+            deletedValue.setVisible(false);
+            add(deletedValue);
+
+            //empty input text field
+            JLabel emptyDValue = new JLabel("Empty Input");
+            emptyDValue.setBounds(370,50,80,30);
+            emptyDValue.setVisible(false);
+            add(emptyDValue);
+
+            //submit button
+            JButton submitDValue = new JButton("Submit");
+            submitDValue.setBounds(280,50,80,30);
+            submitDValue.setVisible(true);
+            add(submitDValue);
+            submitDValue.addActionListener(e -> {
+                emptyDValue.setVisible(false);
+                deletedValue.setVisible(false);
+                if (!deleteData.getText().isEmpty()) { //catching empty input
+                    try {
+                        float value = Float.parseFloat(deleteData.getText());
+                        if(fileData.remove(Float.valueOf(value))) {
+                            updateReport("Successfully deleted keyboard input: " + value + "\n");
+                            deletedValue.setVisible(true);
+                            emptyDValue.setVisible(false);
+                        }
+                        else {
+                            updateReport("Unsuccessfully deleted keyboard input: " + value + "\n");
+                            JOptionPane.showMessageDialog(this,
+                                    "Number is not present",
+                                    "Invalid input detected",
+                                    JOptionPane.ERROR_MESSAGE);
+                            log.addError(4);
+                        }
+
+                    } catch (NumberFormatException ex5) {
+                        JOptionPane.showMessageDialog(this,
+                                "Please enter a number",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                        updateReport("Unsuccessfully deleted keyboard input\n");
+                        log.addError(2);
+                    }
+                } else {
+                    emptyDValue.setVisible(true);
+                    deletedValue.setVisible(false);
+                    updateReport("Unsuccessfully deleted keyboard input\n");
                 }
             });
 
@@ -122,6 +451,10 @@ class MainPage extends JDialog {
             displayData.setBounds(20, 150, 700, 450);
             displayData.setLineWrap(true);
             displayData.setVisible(false);
+            displayData.setText("");
+            fileData.sort(null);
+            updateDisplay(displayData);
+            displayData.setVisible(true);
             add(displayData);
 
 
@@ -133,65 +466,56 @@ class MainPage extends JDialog {
             JLabel refreshSection = new JLabel("Refresh:");
             refreshSection.setFont(
                     new Font("Serif", Font.BOLD, 18));
-            refreshSection.setBounds(20, 120, 200, 30);
+            refreshSection.setBounds(20, 160, 200, 30);
             add(refreshSection);
 
             // Display data button
             JButton display = new JButton("Display Data");
-            display.setBounds(20, 150, 150, 30);
+            display.setBounds(20, 190, 150, 30);
             add(display);
 
+            //Needs to display in 4 columns with descending order
             display.addActionListener(e -> {
-                displayData.setText("");
-                fileData.sort(null);
-                for (Integer element : fileData) {
-                    displayData.append(element + " ");
-                }
+                updateDisplay(displayData);
+                refreshSwitch = true;
                 displayData.setVisible(true);
                 tabbedPane.setSelectedIndex(0);
+                updateReport("Refreshed and viewed displayed data\n");
             });
 
             // Display Graph button
             JButton displayGraph = new JButton("Display Graph");
-            displayGraph.setBounds(20, 200, 150, 30);
+            displayGraph.setBounds(20, 240, 150, 30);
             add(displayGraph);
 
             // Calculate minimum and maximum value of dataset:
-            int max = Integer.MIN_VALUE;
-            int min = Integer.MAX_VALUE;
-
-            for (Integer i : fileData) {
-                if (max < i) {
-                    max = i;
-                }
-                if (min > i) {
-                    min = i;
-                }
-            }
+            float max = SetBoundary.getHigherBound();
+            float min = SetBoundary.getLowerBound();
 
             int one = 0, two = 0, three = 0, four = 0, five = 0, six = 0,
                     seven = 0, eight = 0, nine = 0, ten = 0;
 
-            for (Integer i : fileData) {
-                if (i <= (min + max) * 0.1)
+            for (Float i : fileData) {
+                float percentage = (i - min) / (max - min);
+                if (percentage <= (float) 0.1)
                     one += 1;
-                else if (i > (min + max) * 0.1 && i <= (min + max) * 0.2)
+                else if (percentage > (float) 0.1 && percentage <= (float) 0.2)
                     two += 1;
-                else if (i > (min + max) * 0.2 && i <= (min + max) * 0.3)
+                else if (percentage > (float) 0.2 && percentage <=  (float) 0.3)
                     three += 1;
-                else if (i > (min + max) * 0.3 && i <= (min + max) * 0.4)
+                else if (percentage > (float) 0.3 && percentage <= (float) 0.4)
                     four += 1;
-                else if (i > (min + max) * 0.4 && i <= (min + max) * 0.5)
+                else if (percentage > (float) 0.4 && percentage <= (float) 0.5)
                     five += 1;
-                else if (i > (min + max) * 0.5 && i <= (min + max) * 0.6)
+                else if (percentage > (float) 0.5 && percentage <= (float) 0.6)
                     six += 1;
-                else if (i > (min + max) * 0.6 && i <= (min + max) * 0.7)
+                else if (percentage > (float) 0.6 && percentage <= (float) 0.7)
                     seven += 1;
-                else if (i > (min + max) * 0.7 && i <= (min + max) * 0.8)
+                else if (percentage > (float) 0.7 && percentage <= (float) 0.8)
                     eight += 1;
-                else if (i > (min + max) * 0.8 && i <= (min + max) * 0.9)
+                else if (percentage > (float) 0.8 && percentage <= (float) 0.9)
                     nine += 1;
-                else if (i > (min + max) * 0.9)
+                else if (percentage > (float) 0.9)
                     ten += 1;
             }
 
@@ -225,97 +549,198 @@ class MainPage extends JDialog {
 
             // Update Graph
             displayGraph.addActionListener(e -> {
-                // Calculate minimum and maximum value of dataset:
-                int max1 = Integer.MIN_VALUE;
-                int min1 = Integer.MAX_VALUE;
-
-                for (Integer i : fileData) {
-                    if (max1 < i) {
-                        max1 = i;
-                    }
-                    if (min1 > i) {
-                        min1 = i;
-                    }
-                }
-
-                int first = 0, second = 0, third = 0, fourth = 0, fifth = 0,
-                        sixth = 0, seventh = 0, eighth = 0, ninth = 0, tenth = 0;
-
-                for (Integer i : fileData) {
-                    if (i <= (min1 + max1) * 0.1)
-                        first += 1;
-                    else if (i > (min1 + max1) * 0.1 && i <= (min1 + max1) * 0.2)
-                        second += 1;
-                    else if (i > (min1 + max1) * 0.2 && i <= (min1 + max1) * 0.3)
-                        third += 1;
-                    else if (i > (min1 + max1) * 0.3 && i <= (min1 + max1) * 0.4)
-                        fourth += 1;
-                    else if (i > (min1 + max1) * 0.4 && i <= (min1 + max1) * 0.5)
-                        fifth += 1;
-                    else if (i > (min1 + max1) * 0.5 && i <= (min1 + max1) * 0.6)
-                        sixth += 1;
-                    else if (i > (min1 + max1) * 0.6 && i <= (min1 + max1) * 0.7)
-                        seventh += 1;
-                    else if (i > (min1 + max1) * 0.7 && i <= (min1 + max1) * 0.8)
-                        eighth += 1;
-                    else if (i > (min1 + max1) * 0.8 && i <= (min1 + max1) * 0.9)
-                        ninth += 1;
-                    else if (i > (min1 + max1) * 0.9)
-                        tenth += 1;
-                }
-
-                DefaultCategoryDataset dataSet1 = new DefaultCategoryDataset();
-
-                dataSet1.addValue(first, "0-10 %", "0-10 %");
-                dataSet1.addValue(second, "11-20 %", "11-20 %");
-                dataSet1.addValue(third, "21-30 %", "21-30 %");
-                dataSet1.addValue(fourth, "31-40 %", "31-40 %");
-                dataSet1.addValue(fifth, "41-50 %", "41-50 %");
-                dataSet1.addValue(sixth, "51-60 %", "51-60 %");
-                dataSet1.addValue(seventh, "61-70 %", "61-70 %");
-                dataSet1.addValue(eighth, "71-80 %", "71-80 %");
-                dataSet1.addValue(ninth, "81-90 %", "81-90 %");
-                dataSet1.addValue(tenth, "91-100 %", "91-100 %");
-
-                // Set new dataset
-                chartPlot.setDataset(dataSet1);
+                refreshSwitch = true;
+                updateDisplayGraph(chartPlot);
                 tabbedPane.setSelectedIndex(1);
+                updateReport("Refreshed and viewed data bar graph\n");
             });
 
             // Display Analysis button
             JButton displayAnalysis = new JButton("Data Analysis");
-            displayAnalysis.setBounds(20, 250, 150, 30);
+            displayAnalysis.setBounds(20, 290, 150, 30);
             add(displayAnalysis);
 
-            Analysis analysisPanel = new Analysis();
+            //Analysis analysisPanel = new Analysis();
             displayAnalysis.addActionListener(e -> {
+                refreshSwitch = true;
                 analysisPanel.update();
                 analysisPanel.repaint();
                 tabbedPane.setSelectedIndex(2);
+                updateReport("Refreshed and viewed data analysis\n");
             });
 
             // Display distribution graph button
             JButton displayDistribution = new JButton("Distribution Graph");
-            displayDistribution.setBounds(20, 300, 150, 30);
+            displayDistribution.setBounds(20, 340, 150, 30);
             add(displayDistribution);
 
-            DistributionGraph distributionGraph = new DistributionGraph();
+            //DistributionGraph distribution = new DistributionGraph();
             displayDistribution.addActionListener(e -> {
-                distributionGraph.updateGraph();
-                distributionGraph.repaint();
+                refreshSwitch = true;
+                distribution.update();
+                distribution.repaint();
                 tabbedPane.setSelectedIndex(3);
+                updateReport("Refreshed and viewed data distribution\n");
             });
 
             tabbedPane.addTab("Display Data", displayData);
             tabbedPane.addTab("Display Graph", chartPanel);
             tabbedPane.addTab("Data Analysis", analysisPanel);
-            tabbedPane.addTab("Distribution Graph", distributionGraph);
+            tabbedPane.addTab("Distribution", distribution);
             tabbedPane.setBounds(200, 150, 1000, 450);
+
+            //Change listener to update data on tab switch
+            ChangeListener changeListener = new ChangeListener() {
+                public void stateChanged(ChangeEvent change) {
+                    JTabbedPane source = (JTabbedPane) change.getSource();
+                    int index = source.getSelectedIndex();
+                    if (index == 0) {
+                        updateDisplay(displayData);
+                        if(!refreshSwitch)
+                            updateReport("Viewed displayed data\n");
+                        refreshSwitch = false;
+                    } else if (index == 1) {
+                        updateDisplayGraph(chartPlot);
+                        if(!refreshSwitch)
+                            updateReport("Viewed data bar graph\n");
+                        refreshSwitch = false;
+                    }
+                    else if (index == 2) {
+                        analysisPanel.update();
+                        analysisPanel.repaint();
+                        if(!refreshSwitch)
+                            updateReport("Viewed data analysis\n");
+                        refreshSwitch = false;
+                    } else if (index == 3) {
+                        distribution.update();
+                        distribution.repaint();
+                        if(!refreshSwitch)
+                            updateReport("Viewed data distribution\n");
+                        refreshSwitch = false;
+                    }
+                }
+            };
+
+            tabbedPane.addChangeListener(changeListener);
             add(tabbedPane);
             tabbedPane.setVisible(true);
 
         } // else Display main page
     }// End Init ui
+
+    //Function for updating display graph
+    private void updateDisplayGraph(CategoryPlot catPlot) {
+        float max = SetBoundary.getHigherBound();
+        float min = SetBoundary.getLowerBound();
+
+        int one = 0, two = 0, three = 0, four = 0, five = 0,
+                six = 0, seven = 0, eight = 0, nine = 0, ten = 0;
+
+        for (Float i : fileData) {
+            float percentage = (i - min) / (max - min);
+            if (percentage <= (float) 0.1)
+                one += 1;
+            else if (percentage > (float) 0.1 && percentage <= (float) 0.2)
+                two += 1;
+            else if (percentage > (float) 0.2 && percentage <=  (float) 0.3)
+                three += 1;
+            else if (percentage > (float) 0.3 && percentage <= (float) 0.4)
+                four += 1;
+            else if (percentage > (float) 0.4 && percentage <= (float) 0.5)
+                five += 1;
+            else if (percentage > (float) 0.5 && percentage <= (float) 0.6)
+                six += 1;
+            else if (percentage > (float) 0.6 && percentage <= (float) 0.7)
+                seven += 1;
+            else if (percentage > (float) 0.7 && percentage <= (float) 0.8)
+                eight += 1;
+            else if (percentage > (float) 0.8 && percentage <= (float) 0.9)
+                nine += 1;
+            else if (percentage > (float) 0.9)
+                ten += 1;
+        }
+
+        DefaultCategoryDataset dataSet1 = new DefaultCategoryDataset();
+
+        dataSet1.addValue(one, "0-10 %", "0-10 %");
+        dataSet1.addValue(two, "11-20 %", "11-20 %");
+        dataSet1.addValue(three, "21-30 %", "21-30 %");
+        dataSet1.addValue(four, "31-40 %", "31-40 %");
+        dataSet1.addValue(five, "41-50 %", "41-50 %");
+        dataSet1.addValue(six, "51-60 %", "51-60 %");
+        dataSet1.addValue(seven, "61-70 %", "61-70 %");
+        dataSet1.addValue(eight, "71-80 %", "71-80 %");
+        dataSet1.addValue(nine, "81-90 %", "81-90 %");
+        dataSet1.addValue(ten, "91-100 %", "91-100 %");
+
+        // Set new dataset
+        catPlot.setDataset(dataSet1);
+    }
+
+    //Function for updating display data
+    private void updateDisplay(JTextArea displayData) {
+        //Wipe the previous text data
+        displayData.setText("");
+        fileData.sort(null);
+
+        //Making buckets to hold "column" data in descending order
+        int count = 0; for(Float element : fileData) { count++; }
+        int bucketCapacity = count / 4;
+        int bucketOverflow = count % 4;
+        int bucketLevel1 = 0, bucketLevel2 = 0, bucketLevel3 = 0;
+        String bucket1 = "", bucket2 = "", bucket3 = "", bucket4 = "";
+
+        //Fill buckets to their capacity, any overflow goes into the first bucket
+        for (int i = count-1; i >= 0; i--) {
+            if(bucketLevel1 < (bucketCapacity+bucketOverflow)) {
+                bucket1 += (fileData.get(i) + ",");
+                bucketLevel1++;
+            }
+            else if(bucketLevel2 < bucketCapacity) {
+                bucket2 += (fileData.get(i) + ",");
+                bucketLevel2++;
+            }
+            else if(bucketLevel3 < bucketCapacity) {
+                bucket3 += (fileData.get(i) +",");
+                bucketLevel3++;
+            }
+            else {
+                bucket4 += (fileData.get(i) +",");
+            }
+        }
+
+        //Empty buckets into arrays so the individual strings can be printed
+        String emptiedBucket1[] = bucket1.split(",");
+        String emptiedBucket2[] = bucket2.split(",");
+        String emptiedBucket3[] = bucket3.split(",");
+        String emptiedBucket4[] = bucket4.split(",");
+
+        //Print the bucket contents in descending order with 4 columns
+        for(int i = 0; i < (bucketCapacity+bucketOverflow); i++) {
+            String padded = "";
+            if(i < emptiedBucket1.length) {
+                padded = String.format("%-30s", emptiedBucket1[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket2.length) {
+                padded = String.format("%-30s", emptiedBucket2[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket3.length) {
+                padded = String.format("%-30s", emptiedBucket3[i]);
+                displayData.append(padded);
+            }
+            if(i < emptiedBucket4.length) {
+                padded = String.format("%-30s", emptiedBucket4[i]);
+                displayData.append(padded);
+            }
+
+            displayData.append("\n");
+        }
+        displayData.setVisible(true);
+    }
+
+    public static void updateReport(String content) {
+        reportContent += content;
+    }
 }
-
-

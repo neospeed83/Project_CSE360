@@ -114,6 +114,11 @@ class MainPage extends JDialog {
             MainPage.updateReport("New Data Set - Successfully loaded program with the file: "
                     + selectedFile + "\n");
 
+            //Create a folder for reports
+            File folder = new File("Reports");
+            if (!folder.exists())
+                folder.mkdir();
+
             // "Add" Section Label
             JLabel addSection = new JLabel("Add:");
             addSection.setFont(
@@ -781,13 +786,14 @@ class MainPage extends JDialog {
         reportContent += content;
     }
 
-    private static void createReportFile() {
-        File report = new File("report" + fileNumber + ".txt");
+    private void createReportFile() {
+        File report = new File("Reports"+ File.separator + "report" + fileNumber + ".txt");
         while(initialFileCreation && report.exists()) {
             fileNumber++;
-            report = new File("report" + fileNumber + ".txt");
+            report = new File("Reports"+ File.separator + "report" + fileNumber + ".txt");
         }
         try {
+            report.createNewFile();
             if (initialFileCreation) {
                 initialFileCreation = false;
                 FileWriter fw = new FileWriter(report, true);

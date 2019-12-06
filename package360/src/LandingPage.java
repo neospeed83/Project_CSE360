@@ -24,6 +24,9 @@ public class LandingPage extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        //create error log
+        ErrorLog log = ErrorLog.getInstance();
+
         //set boundaries
         JLabel lowerBound = new JLabel("Lower bound");
         JTextField tfLower = new JTextField(50);
@@ -50,12 +53,6 @@ public class LandingPage extends JFrame {
         add(boundSet);
         boundSet.setVisible(false);
 
-        // Error: Bounds can't be empty
-        JLabel emptyBounds = new JLabel("Upper / Lower Bound can't be empty");
-        emptyBounds.setBounds(370, 30, 300, 30);
-        add(emptyBounds);
-        emptyBounds.setVisible(false);
-
         //set button
         JButton setBoundaries = new JButton("Set Bounds");
         setBoundaries.setBounds(600, 100, 120, 30);
@@ -66,20 +63,33 @@ public class LandingPage extends JFrame {
                 try {
                     float low = Float.parseFloat(tfLower.getText());
                     float high = Float.parseFloat(tfUpper.getText());
-                    SetBoundary.updateBoundaries(low, high);
+
+                    if(low <= high)
+                        SetBoundary.updateBoundaries(low, high);
+                    else {
+                        JOptionPane.showMessageDialog(this,
+                                "Lower bound must be less than or equal to upper bound.",
+                                "Invalid input detected",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                     MainPage.boundaryFlag = true;
                     boundSet.setVisible(true);
-                    emptyBounds.setVisible(false);
 
                 } catch (NumberFormatException ex5) {
                     JOptionPane.showMessageDialog(this,
                             "Please enter a number",
                             "Invalid input detected",
                             JOptionPane.ERROR_MESSAGE);
+                    MainPage.updateReport("Unsuccessfully set bounds \n");
+                    log.addError(2);
                 }
             } else {
-                emptyBounds.setVisible(true);
-                boundSet.setVisible(false);
+                JOptionPane.showMessageDialog(this,
+                        "Upper / lower bounds can't be empty",
+                        "Empty Bounds",
+                        JOptionPane.ERROR_MESSAGE);
+                MainPage.updateReport("Unsuccessfully set bounds \n");
+                log.addError(1);
             }
         });
 
@@ -89,7 +99,6 @@ public class LandingPage extends JFrame {
         add(browseButton);
         browseButton.setBounds(20, 200, 100, 30);
         browseButton.addActionListener(e -> {
-            emptyBounds.setVisible(false);
             boundSet.setVisible(false);
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             jfc.setDialogTitle("Select a csv or txt");
@@ -107,6 +116,7 @@ public class LandingPage extends JFrame {
                             "Please check your file name",
                             "File Does not exist!",
                             JOptionPane.ERROR_MESSAGE);
+                    log.addError(0);
                 }
 
                 if (jfc.getSelectedFile().exists() && returnValue == JFileChooser.APPROVE_OPTION) {

@@ -30,8 +30,10 @@ class MainPage extends JDialog {
     static boolean boundaryFlag = true;
     static boolean reportFlag = false;
     static boolean refreshSwitch = false;
+    static boolean initialFileCreation = true;
 
     private static String reportContent = "";
+    private static int fileNumber = 1;
 
     MainPage(File inputFile) {
         selectedFile = inputFile;
@@ -56,6 +58,9 @@ class MainPage extends JDialog {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        //create error log
+        ErrorLog log = ErrorLog.getInstance();
+
         // Load file fileData into -> fileData
         fileData = ReadFile.readFileByName(selectedFile.getPath());
         for (Float i : fileData) {
@@ -73,6 +78,7 @@ class MainPage extends JDialog {
                     "The file contains out of bounds data!",
                     "Data Boundary Error",
                     JOptionPane.ERROR_MESSAGE);
+            log.addError(1);
             MainPage.updateReport("Unsuccessfully loaded program with the file: " + selectedFile + "\n");
         } else {
             // Display Main Page
@@ -120,10 +126,16 @@ class MainPage extends JDialog {
                                     "The file contains out of bounds data!",
                                     "Data Boundary Error",
                                     JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
                         } else {
                             fileData.addAll(append); // Append to fileData
                             MainPage.updateReport("Successfully appended program with the file: "
                                     + jfc.getSelectedFile() + "\n");
+
+                            JOptionPane.showMessageDialog(this,
+                                    "Successfully appended to file, refresh or view data.",
+                                    "Appended File",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -162,12 +174,23 @@ class MainPage extends JDialog {
                                     "The file contains out of bounds data!",
                                     "Data Boundary Error",
                                     JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
                             MainPage.updateReport("Unsuccessfully loaded program with the file: "
                                     + jfc.getSelectedFile() + "\n");
                         } else {
+                            createReportFile();
+                            fileNumber++;
+                            reportContent ="Bounds are: " + SetBoundary.getLowerBound() + ", " +
+                                    SetBoundary.getHigherBound();
+                            initialFileCreation = true;
                             fileData = load; // Load to fileData
                             MainPage.updateReport("\nNew Data Set - Successfully loaded program with the file: "
                                     + jfc.getSelectedFile() + "\n");
+
+                            JOptionPane.showMessageDialog(this,
+                                    "Successfully loaded file, refresh or view data.",
+                                    "Loaded File",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -223,6 +246,7 @@ class MainPage extends JDialog {
                                         "The file contains out of bounds data!",
                                         "Data Boundary Error",
                                         JOptionPane.ERROR_MESSAGE);
+                                log.addError(1);
 
                                 updateReport("Unsuccessfully set bounds to: " + low + ", " + high + "\n");
                             }
@@ -237,11 +261,14 @@ class MainPage extends JDialog {
                                     "Boundaries Set",
                                     JOptionPane.INFORMATION_MESSAGE);
                         }
+
+                        boundaryFlag = true; //Revert flag for next load or boundary check
                     } catch (NumberFormatException ex5) {
                         JOptionPane.showMessageDialog(this,
                                 "Please enter a number",
                                 "Invalid input detected",
                                 JOptionPane.ERROR_MESSAGE);
+                        log.addError(2);
 
                         updateReport("Unsuccessfully set bounds \n");
                     }
@@ -250,6 +277,7 @@ class MainPage extends JDialog {
                             "Upper / lower bounds can't be empty",
                             "Empty Bounds",
                             JOptionPane.ERROR_MESSAGE);
+                    log.addError(1);
                     updateReport("Unsuccessfully set bounds \n");
                 }
             });
@@ -259,31 +287,27 @@ class MainPage extends JDialog {
             add(createReport);
             createReport.setBounds(1100, 50, 125, 30);
             createReport.addActionListener(e -> {
-                File report = new File("report.txt");
-                try {
-                    if(report.createNewFile()) {
-                        FileWriter fw = new FileWriter(report, true);
-                        BufferedWriter bw = new BufferedWriter(fw);
-                        bw.write("Created Report:\n\n");
-                        bw.write(reportContent);
-                        reportContent = "";
-                        bw.close();
+                   createReportFile();
 
-                        reportFlag = true;
-                    }
-                    else {
-                        FileWriter fw = new FileWriter(report, true);
-                        BufferedWriter bw = new BufferedWriter(fw);
-                        if(!reportFlag)
-                            bw.write("\nNew Program Instance\n");
-                        bw.write(reportContent);
-                        reportContent = "";
-                        bw.close();
+                   JOptionPane.showMessageDialog(this,
+                            "Report created successfully",
+                            "Report Created",
+                            JOptionPane.INFORMATION_MESSAGE);
+            });
 
-                        reportFlag = true;
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+            //Error Log - Henry
+            //Display Error Log Button
+            JButton errorLog = new JButton("Error Log");
+            add(errorLog);
+            errorLog.setBounds(1100, 100, 125, 30);
+            errorLog.addActionListener(e -> {
+                if(log.isEmpty())
+                {
+                    JOptionPane.showMessageDialog(this,"Error Log is empty.",
+                            "Error Log", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, log.getReport(),
+                            "Error Log", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
 
@@ -336,6 +360,7 @@ class MainPage extends JDialog {
                                     "Value is out of bounds",
                                     "Out of Bounds",
                                     JOptionPane.ERROR_MESSAGE);
+                            log.addError(1);
                         }
 
                     } catch (NumberFormatException ex5) {
@@ -344,6 +369,7 @@ class MainPage extends JDialog {
                                 "Invalid input detected",
                                 JOptionPane.ERROR_MESSAGE);
                         updateReport("Unsuccessfully added keyboard input\n");
+                        log.addError(2);
                     }
                 } else {
                     emptyValue.setVisible(true);
@@ -404,6 +430,7 @@ class MainPage extends JDialog {
                                     "Number is not present",
                                     "Invalid input detected",
                                     JOptionPane.ERROR_MESSAGE);
+                            log.addError(4);
                         }
 
                     } catch (NumberFormatException ex5) {
@@ -412,6 +439,7 @@ class MainPage extends JDialog {
                                 "Invalid input detected",
                                 JOptionPane.ERROR_MESSAGE);
                         updateReport("Unsuccessfully deleted keyboard input\n");
+                        log.addError(2);
                     }
                 } else {
                     emptyDValue.setVisible(true);
@@ -545,7 +573,7 @@ class MainPage extends JDialog {
             });
 
             // Display distribution graph button
-            JButton displayDistribution = new JButton("Distribution Graph");
+            JButton displayDistribution = new JButton("Distribution");
             displayDistribution.setBounds(20, 340, 150, 30);
             add(displayDistribution);
 
@@ -717,5 +745,37 @@ class MainPage extends JDialog {
 
     public static void updateReport(String content) {
         reportContent += content;
+    }
+
+    private static void createReportFile() {
+        File report = new File("report" + fileNumber + ".txt");
+        while(initialFileCreation && report.exists()) {
+            fileNumber++;
+            report = new File("report" + fileNumber + ".txt");
+        }
+        try {
+            if (initialFileCreation) {
+                initialFileCreation = false;
+                FileWriter fw = new FileWriter(report, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write("Created Report:\n\n");
+                bw.write(reportContent);
+                reportContent = "";
+                bw.close();
+                fw.close();
+
+                reportFlag = true;
+            } else {
+                FileWriter fw = new FileWriter(report, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(reportContent);
+                reportContent = "";
+                bw.close();
+                fw.close();
+
+                reportFlag = true;
+            }
+        }
+        catch(IOException e) {}
     }
 }

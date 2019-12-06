@@ -27,6 +27,28 @@ public class LandingPage extends JFrame {
         //create error log
         ErrorLog log = ErrorLog.getInstance();
 
+        //Error Log - Henry
+        //Display Error Log Button
+        JButton errorLog = new JButton("Error Log");
+        add(errorLog);
+        errorLog.setBounds(650, 20, 120, 30);
+        errorLog.addActionListener(e -> {
+            if(log.isEmpty())
+            {
+                JOptionPane.showMessageDialog(this,"Error Log is empty.",
+                        "Error Log", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                String errors = (log.getReport());
+                JTextArea errorArea = new JTextArea(errors, 6, 50);
+                errorArea.setWrapStyleWord(true);
+                errorArea.setLineWrap(true);
+                errorArea.setEditable(false);
+                JScrollPane sp = new JScrollPane(errorArea);
+                JOptionPane.showMessageDialog(this, sp,
+                        "Error Log", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
         //set boundaries
         JLabel lowerBound = new JLabel("Lower bound");
         JTextField tfLower = new JTextField(50);
@@ -49,7 +71,7 @@ public class LandingPage extends JFrame {
 
         // Boundaries set message
         JLabel boundSet = new JLabel("Boundaries Set Successfully.");
-        boundSet.setBounds(370, 30, 300, 30);
+        boundSet.setBounds(250, 30, 300, 30);
         add(boundSet);
         boundSet.setVisible(false);
 
@@ -64,16 +86,18 @@ public class LandingPage extends JFrame {
                     float low = Float.parseFloat(tfLower.getText());
                     float high = Float.parseFloat(tfUpper.getText());
 
-                    if(low <= high)
+                    if(low <= high) {
                         SetBoundary.updateBoundaries(low, high);
+                        MainPage.boundaryFlag = true;
+                        boundSet.setVisible(true);
+                    }
                     else {
                         JOptionPane.showMessageDialog(this,
                                 "Lower bound must be less than or equal to upper bound.",
                                 "Invalid input detected",
                                 JOptionPane.ERROR_MESSAGE);
+                        log.addError(1);
                     }
-                    MainPage.boundaryFlag = true;
-                    boundSet.setVisible(true);
 
                 } catch (NumberFormatException ex5) {
                     JOptionPane.showMessageDialog(this,
@@ -128,6 +152,8 @@ public class LandingPage extends JFrame {
                         ex.printStackTrace();
                     }
                 }
+                else
+                    errorFlag = false;
             }
         });
     }

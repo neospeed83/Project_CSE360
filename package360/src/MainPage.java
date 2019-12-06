@@ -31,6 +31,7 @@ class MainPage extends JDialog {
     static boolean reportFlag = false;
     static boolean refreshSwitch = false;
     static boolean initialFileCreation = true;
+    static boolean errorFlag = false;
 
     private static String reportContent = "";
     private static int fileNumber = 1;
@@ -61,6 +62,28 @@ class MainPage extends JDialog {
         //create error log
         ErrorLog log = ErrorLog.getInstance();
 
+        //Error Log - Henry
+        //Display Error Log Button
+        JButton errorLog = new JButton("Error Log");
+        add(errorLog);
+        errorLog.setBounds(1100, 100, 125, 30);
+        errorLog.addActionListener(e -> {
+            if(log.isEmpty())
+            {
+                JOptionPane.showMessageDialog(this,"Error Log is empty.",
+                        "Error Log", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                String errors = (log.getReport());
+                JTextArea errorArea = new JTextArea(errors, 6, 50);
+                errorArea.setWrapStyleWord(true);
+                errorArea.setLineWrap(true);
+                errorArea.setEditable(false);
+                JScrollPane sp = new JScrollPane(errorArea);
+                JOptionPane.showMessageDialog(this, sp,
+                        "Error Log", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
         // Load file fileData into -> fileData
         fileData = ReadFile.readFileByName(selectedFile.getPath());
         for (Float i : fileData) {
@@ -68,12 +91,17 @@ class MainPage extends JDialog {
             int lower = i.compareTo(SetBoundary.getLowerBound());
             if (higher > 0 || lower < 0) {
                 boundaryFlag = false;
+                log.setOutOfBoundsVal(i);
+                log.updateOutOfBoundsVal();
                 break;
             }
         }
 
-        // handle out of bounds data error OR ELSE show Main Screen
-        if (!boundaryFlag) {
+        // handle out of bounds data error and other errors OR ELSE show Main Screen
+        if(errorFlag) {
+            errorFlag = false;
+        }
+        else if (!boundaryFlag) {
             JOptionPane.showMessageDialog(this,
                     "The file contains out of bounds data!",
                     "Data Boundary Error",
@@ -115,11 +143,15 @@ class MainPage extends JDialog {
                             float higher = i.compareTo(SetBoundary.getHigherBound());
                             float lower = i.compareTo(SetBoundary.getLowerBound());
                             if (higher > 0 || lower < 0) {
+                                log.setOutOfBoundsVal(i);
+                                log.updateOutOfBoundsVal();
                                 boundaryFlag = false;
                                 break;
                             }
                         }
-                        if (!boundaryFlag) {
+                        if(errorFlag)
+                            errorFlag = false;
+                        else if (!boundaryFlag) {
                             MainPage.updateReport("Unsuccessfully appended program with the file: "
                                     + jfc.getSelectedFile() + "\n");
                             JOptionPane.showMessageDialog(jfc,
@@ -165,11 +197,15 @@ class MainPage extends JDialog {
                             float higher = i.compareTo(SetBoundary.getHigherBound());
                             float lower = i.compareTo(SetBoundary.getLowerBound());
                             if (higher > 0 || lower < 0) {
+                                log.setOutOfBoundsVal(i);
+                                log.updateOutOfBoundsVal();
                                 boundaryFlag = false;
                                 break;
                             }
                         }
-                        if (!boundaryFlag) {
+                        if(errorFlag)
+                            errorFlag = false;
+                        else if (!boundaryFlag) {
                             JOptionPane.showMessageDialog(jfc,
                                     "The file contains out of bounds data!",
                                     "Data Boundary Error",
@@ -242,6 +278,8 @@ class MainPage extends JDialog {
                             if (canUpdateBounds && (i < low || i > high)) {
                                 canUpdateBounds = false;
                                 boundaryFlag = false;
+                                log.setOutOfBoundsVal(i);
+                                log.updateOutOfBoundsVal();
                                 JOptionPane.showMessageDialog(this,
                                         "The file contains out of bounds data!",
                                         "Data Boundary Error",
@@ -295,22 +333,6 @@ class MainPage extends JDialog {
                             JOptionPane.INFORMATION_MESSAGE);
             });
 
-            //Error Log - Henry
-            //Display Error Log Button
-            JButton errorLog = new JButton("Error Log");
-            add(errorLog);
-            errorLog.setBounds(1100, 100, 125, 30);
-            errorLog.addActionListener(e -> {
-                if(log.isEmpty())
-                {
-                    JOptionPane.showMessageDialog(this,"Error Log is empty.",
-                            "Error Log", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this, log.getReport(),
-                            "Error Log", JOptionPane.INFORMATION_MESSAGE);
-                }
-            });
-
             //Add button - Nick
             //Input label and text field
             JLabel inputLabel = new JLabel("Input");
@@ -353,9 +375,15 @@ class MainPage extends JDialog {
                         if(value >= lB && value <= hB) {
                             fileData.add(value);
                             updateReport("Successfully added keyboard input: " + value + "\n");
+                            JOptionPane.showMessageDialog(this,
+                                    "Successfully added keyboard input, refresh or view data.",
+                                    "Added Keyboard Input",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                         else {
                             updateReport("Unsuccessfully added keyboard input: " + value + "\n");
+                            log.setOutOfBoundsVal(value);
+                            log.updateOutOfBoundsVal();
                             JOptionPane.showMessageDialog(this,
                                     "Value is out of bounds",
                                     "Out of Bounds",
@@ -423,6 +451,10 @@ class MainPage extends JDialog {
                             updateReport("Successfully deleted keyboard input: " + value + "\n");
                             deletedValue.setVisible(true);
                             emptyDValue.setVisible(false);
+                            JOptionPane.showMessageDialog(this,
+                                    "Successfully deleted keyboard input, refresh or view data.",
+                                    "Deleted Keyboard Input",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                         else {
                             updateReport("Unsuccessfully deleted keyboard input: " + value + "\n");
@@ -458,7 +490,8 @@ class MainPage extends JDialog {
             fileData.sort(null);
             updateDisplay(displayData);
             displayData.setVisible(true);
-            add(displayData);
+            JScrollPane displayScrollPane = new JScrollPane(displayData);
+            add(displayScrollPane);
 
 
             // Declaring Tabbed pane here to change active tab on button click
@@ -586,7 +619,7 @@ class MainPage extends JDialog {
                 updateReport("Refreshed and viewed data distribution\n");
             });
 
-            tabbedPane.addTab("Display Data", displayData);
+            tabbedPane.addTab("Display Data", displayScrollPane);
             tabbedPane.addTab("Display Graph", chartPanel);
             tabbedPane.addTab("Data Analysis", analysisPanel);
             tabbedPane.addTab("Distribution", distribution);

@@ -14,12 +14,14 @@ class ReadFile {
         ErrorLog log = ErrorLog.getInstance();
 
         List<String> lines;
+        int lineNumber = 0;
         String[] elements = null;
         List<Float> result = new ArrayList<>(Collections.emptyList());
         try {
             lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
 
             for (String s : lines) {
+                lineNumber++;
                 if (!s.isBlank())
                     if (!s.contains(",")) {
                         result.add(Float.parseFloat(s));
@@ -45,6 +47,8 @@ class ReadFile {
                     "Invalid file data!",
                     JOptionPane.ERROR_MESSAGE);
             LandingPage.setErrorFlag();
+            MainPage.errorFlag = true;
+            log.setLineNumber(lineNumber);
             log.addError(3);
         } catch (IOException e) {
             LandingPage.setErrorFlag();

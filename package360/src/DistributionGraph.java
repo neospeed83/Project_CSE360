@@ -168,43 +168,43 @@ class DistributionGraph extends JPanel {
         String avg9S = String.format("%.2f", (avg9*100)); String avg10S = String.format("%.2f", (avg10*100));
 
         firstGroup.setText("Count: " + first + "; Average: " + avg1S + "%");
-        firstGroup.setBounds(120, 10, 165, 30);
+        firstGroup.setBounds(120, 10, 210, 30);
         firstGroup.setEditable(false);
 
         secondGroup.setText("Count: " + second + "; Average: " + avg2S + "%");
-        secondGroup.setBounds(120, 50, 165, 30);
+        secondGroup.setBounds(120, 50, 210, 30);
         secondGroup.setEditable(false);
 
         thirdGroup.setText("Count: " + third + "; Average: " + avg3S + "%");
-        thirdGroup.setBounds(120, 90, 165, 30);
+        thirdGroup.setBounds(120, 90, 210, 30);
         thirdGroup.setEditable(false);
 
         fourthGroup.setText("Count: " + fourth + "; Average: " + avg4S + "%");
-        fourthGroup.setBounds(120, 130, 165, 30);
+        fourthGroup.setBounds(120, 130, 210, 30);
         fourthGroup.setEditable(false);
 
         fifthGroup.setText("Count: " + fifth + "; Average: " + avg5S + "%");
-        fifthGroup.setBounds(120, 170, 165, 30);
+        fifthGroup.setBounds(120, 170, 210, 30);
         fifthGroup.setEditable(false);
 
         sixthGroup.setText("Count: " + sixth + "; Average: " + avg6S + "%");
-        sixthGroup.setBounds(120, 210, 165, 30);
+        sixthGroup.setBounds(120, 210, 210, 30);
         sixthGroup.setEditable(false);
 
         seventhGroup.setText("Count: " + seventh + "; Average: " + avg7S + "%");
-        seventhGroup.setBounds(120, 250, 165, 30);
+        seventhGroup.setBounds(120, 250, 210, 30);
         seventhGroup.setEditable(false);
 
         eighthGroup.setText("Count: " + eighth + "; Average: " + avg8S + "%");
-        eighthGroup.setBounds(120, 290, 165, 30);
+        eighthGroup.setBounds(120, 290, 210, 30);
         eighthGroup.setEditable(false);
 
         ninthGroup.setText("Count: " + ninth + "; Average: " + avg9S + "%");
-        ninthGroup.setBounds(120, 330, 165, 30);
+        ninthGroup.setBounds(120, 330, 210, 30);
         ninthGroup.setEditable(false);
 
         tenthGroup.setText("Count: " + tenth + "; Average: " + avg10S + "%");
-        tenthGroup.setBounds(120, 370, 165, 30);
+        tenthGroup.setBounds(120, 370, 210, 30);
         tenthGroup.setEditable(false);
 
         add(firstGroup); add(secondGroup); add(thirdGroup); add(fourthGroup);

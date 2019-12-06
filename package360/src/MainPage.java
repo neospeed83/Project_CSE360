@@ -66,7 +66,7 @@ class MainPage extends JDialog {
         //Display Error Log Button
         JButton errorLog = new JButton("Error Log");
         add(errorLog);
-        errorLog.setBounds(1100, 100, 125, 30);
+        errorLog.setBounds(1075, 100, 125, 30);
         errorLog.addActionListener(e -> {
             if(log.isEmpty())
             {
@@ -214,12 +214,12 @@ class MainPage extends JDialog {
                             MainPage.updateReport("Unsuccessfully loaded program with the file: "
                                     + jfc.getSelectedFile() + "\n");
                         } else {
-                            createReportFile();
-                            fileNumber++;
+                            reportContent = "";
                             reportContent ="Bounds are: " + SetBoundary.getLowerBound() + ", " +
                                     SetBoundary.getHigherBound();
                             initialFileCreation = true;
-                            fileData = load; // Load to fileData
+                            fileData = load; // Load to
+                            setTitle("Grade Analytics - Main Page : " + jfc.getSelectedFile().getName());
                             MainPage.updateReport("\nNew Data Set - Successfully loaded program with the file: "
                                     + jfc.getSelectedFile() + "\n");
 
@@ -323,7 +323,7 @@ class MainPage extends JDialog {
             //Create Report Button
             JButton createReport = new JButton("Create Report");
             add(createReport);
-            createReport.setBounds(1100, 50, 125, 30);
+            createReport.setBounds(1075, 50, 125, 30);
             createReport.addActionListener(e -> {
                    createReportFile();
 
@@ -338,27 +338,27 @@ class MainPage extends JDialog {
             JLabel inputLabel = new JLabel("Input");
             JTextField inputData = new JTextField(50);
             inputLabel.setLabelFor(inputData);
-            inputData.setBounds(50, 130, 40, 30);
-            inputLabel.setBounds(20, 130, 60, 30);
+            inputData.setBounds(240, 90, 40, 30);
+            inputLabel.setBounds(200, 90, 60, 30);
             inputData.setVisible(true);
             add(inputData);
             add(inputLabel);
 
             //Submitted text field
-            JLabel sentValue = new JLabel("Submitted");
-            sentValue.setBounds(180,130,60,30);
+            JLabel sentValue = new JLabel("Inserted");
+            sentValue.setBounds(370,90,60,30);
             sentValue.setVisible(false);
             add(sentValue);
 
             //empty input text field
             JLabel emptyValue = new JLabel("Empty Input");
-            emptyValue.setBounds(180,130,80,30);
+            emptyValue.setBounds(370,90,80,30);
             emptyValue.setVisible(false);
             add(emptyValue);
 
             //submit button
             JButton submitValue = new JButton("Submit");
-            submitValue.setBounds(90,130,80,30);
+            submitValue.setBounds(280,90,80,30);
             submitValue.setVisible(true);
             add(submitValue);
             submitValue.addActionListener(e -> {
@@ -369,11 +369,11 @@ class MainPage extends JDialog {
                         float value = Float.parseFloat(inputData.getText());
                         float hB = SetBoundary.getHigherBound();
                         float lB = SetBoundary.getLowerBound();
-                        sentValue.setVisible(true);
                         emptyValue.setVisible(false);
 
                         if(value >= lB && value <= hB) {
                             fileData.add(value);
+                            sentValue.setVisible(true);
                             updateReport("Successfully added keyboard input: " + value + "\n");
                             JOptionPane.showMessageDialog(this,
                                     "Successfully added keyboard input, refresh or view data.",
@@ -389,6 +389,7 @@ class MainPage extends JDialog {
                                     "Out of Bounds",
                                     JOptionPane.ERROR_MESSAGE);
                             log.addError(1);
+                            sentValue.setVisible(false);
                         }
 
                     } catch (NumberFormatException ex5) {
@@ -408,10 +409,10 @@ class MainPage extends JDialog {
 
             //Delete Button - Nick
             //Remove section
-            JLabel deleteSection = new JLabel("Remove:");
+            JLabel deleteSection = new JLabel("Keyboard Operations:");
             deleteSection.setFont(
                     new Font("Serif", Font.BOLD, 18));
-            deleteSection.setBounds(200, 20, 120, 30);
+            deleteSection.setBounds(200, 20, 200, 30);
             add(deleteSection);
 
             //Delete label and text field
@@ -425,7 +426,7 @@ class MainPage extends JDialog {
             add(deleteLabel);
 
             //Submitted text field
-            JLabel deletedValue = new JLabel("Submitted");
+            JLabel deletedValue = new JLabel("Deleted");
             deletedValue.setBounds(370,50,60,30);
             deletedValue.setVisible(false);
             add(deletedValue);

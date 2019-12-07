@@ -50,11 +50,6 @@ class ReadFile {
                     }
             }
 
-            if(result.isEmpty()) {
-                MainPage.errorFlag = true;
-                MainPage.emptyFileFlag = true;
-                LandingPage.emptyFileFlag = true;
-            }
 
         } catch (NoSuchFileException | FileNotFoundException e) {
             JOptionPane.showMessageDialog(new JFrame(),

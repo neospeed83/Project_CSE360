@@ -15,7 +15,6 @@ import javax.swing.filechooser.FileSystemView;
 public class LandingPage extends JFrame {
 
     private static boolean errorFlag = false;
-    static boolean emptyFileFlag = false;
 
     /**
      * Constructor for the LandingPage class that initializes the starting GUI screen
@@ -167,14 +166,6 @@ public class LandingPage extends JFrame {
                     try {
                         MainPage.boundaryFlag = true;
                         new MainPage(jfc.getSelectedFile());
-                        if(emptyFileFlag) {
-                            log.addError(5);
-                            JOptionPane.showMessageDialog(this,
-                                    "The file inputted is empty",
-                                    "Empty File",
-                                    JOptionPane.ERROR_MESSAGE);
-                            emptyFileFlag = false;
-                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

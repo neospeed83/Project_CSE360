@@ -39,7 +39,6 @@ class MainPage extends JDialog {
     static boolean refreshSwitch = false;
     static boolean initialFileCreation = true;
     static boolean errorFlag = false;
-    static boolean emptyFileFlag = false;
 
     private static String reportContent = "";
     private static int fileNumber = 1;
@@ -88,9 +87,6 @@ class MainPage extends JDialog {
 
         //create error log
         ErrorLog log = ErrorLog.getInstance();
-
-        //Set to false on initialization
-        emptyFileFlag = false;
 
         //Error Log - Henry
         //Display Error Log Button
@@ -186,14 +182,6 @@ class MainPage extends JDialog {
                         }
                         if(errorFlag) {
                             errorFlag = false;
-                            if (emptyFileFlag) {
-                                JOptionPane.showMessageDialog(new JFrame(),
-                                        "The file inputted is empty",
-                                        "Empty File",
-                                        JOptionPane.ERROR_MESSAGE);
-                                emptyFileFlag = false;
-                                log.addError(5);
-                            }
                         }
                         else if (!boundaryFlag) {
                             MainPage.updateReport("Unsuccessfully appended program with the file: "
@@ -249,14 +237,6 @@ class MainPage extends JDialog {
                         }
                         if(errorFlag) {
                             errorFlag = false;
-                            if (emptyFileFlag) {
-                                JOptionPane.showMessageDialog(new JFrame(),
-                                        "The file inputted is empty",
-                                        "Empty File",
-                                        JOptionPane.ERROR_MESSAGE);
-                                emptyFileFlag = false;
-                                log.addError(5);
-                            }
                         }
                         else if (!boundaryFlag) {
                             JOptionPane.showMessageDialog(jfc,

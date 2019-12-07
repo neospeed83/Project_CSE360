@@ -87,6 +87,7 @@ class Analysis extends JPanel {
 
 
         // TextFields and Calculations
+        data = MainPage.getFileData();
 
         float max = Integer.MIN_VALUE;
         float min = Integer.MAX_VALUE;
@@ -106,40 +107,59 @@ class Analysis extends JPanel {
         }
 
 
-        count.setText(Integer.toString(cnt));
+        if(!data.isEmpty())
+            count.setText(Integer.toString(cnt));
+        else
+            count.setText("");
         count.setBounds(120, 50, 200, 30);
         add(count);
 
-        high.setText(Float.toString(max));
+        if(!data.isEmpty())
+            high.setText(Float.toString(max));
+        else
+            high.setText("");
         high.setBounds(120, 100, 200, 30);
         add(high);
 
-        low.setText(Float.toString(min));
+        if(!data.isEmpty())
+            low.setText(Float.toString(min));
+        else
+            low.setText("");
         low.setBounds(120, 150, 200, 30);
         add(low);
 
-        mean.setText(String.format("%.2f", sum / cnt));
+        if(!data.isEmpty())
+            mean.setText(String.format("%.2f", sum / cnt));
+        else
+            mean.setText("");
         mean.setBounds(120, 200, 200, 30);
         add(mean);
 
 
         //Median
-        int mid = cnt / 2;
-        if (cnt % 2 != 0) {
-            //Take middle number
-            median.setText(String.format("%.2f", data.get(mid)));
-        } else {
-            //Add middle two numbers and divide by 2
-            float medianVal = (data.get(mid) + data.get(mid-1)) / 2;
-            median.setText(String.format("%.2f", medianVal));
+        if(!data.isEmpty()) {
+            int mid = cnt / 2;
+            if (cnt % 2 != 0) {
+                //Take middle number
+                median.setText(String.format("%.2f", data.get(mid)));
+            } else {
+                //Add middle two numbers and divide by 2
+                float medianVal = (data.get(mid) + data.get(mid - 1)) / 2;
+                median.setText(String.format("%.2f", medianVal));
+            }
         }
+        else
+            median.setText("");
 
         median.setBounds(120, 250, 200, 30);
         add(median);
 
         int result = findMode(data);
 
-        mode.setText(Integer.toString(result));
+        if(!data.isEmpty())
+            mode.setText(Integer.toString(result));
+        else
+            mode.setText("");
         mode.setBounds(120, 300, 200, 30);
         add(mode);
     }
@@ -169,25 +189,39 @@ class Analysis extends JPanel {
         }
 
 
-        count.setText(Integer.toString(cnt));
-        high.setText(Float.toString(max));
-        low.setText(Float.toString(min));
-        mean.setText(String.format("%.2f", sum / cnt));
+        if (!data.isEmpty()) {
+            count.setText(Integer.toString(cnt));
+            high.setText(Float.toString(max));
+            low.setText(Float.toString(min));
+            mean.setText(String.format("%.2f", sum / cnt));
+        }
+        else {
+            count.setText("");
+            high.setText("");
+            low.setText("");
+            mean.setText("");
+            median.setText("");
+            mode.setText("");
+        }
 
         //Median, needs to be looked at
-        int mid = cnt / 2;
-        if (cnt % 2 != 0) {
-            //Take middle number
-            median.setText(String.format("%.2f", data.get(mid)));
-        } else {
-            //Add middle two numbers and divide by 2
-            float medianVal = (data.get(mid) + data.get(mid-1)) / 2;
-            median.setText(String.format("%.2f", medianVal));
+        if(!data.isEmpty()) {
+            int mid = cnt / 2;
+            if (cnt % 2 != 0) {
+                //Take middle number
+                median.setText(String.format("%.2f", data.get(mid)));
+            } else {
+                //Add middle two numbers and divide by 2
+                float medianVal = (data.get(mid) + data.get(mid - 1)) / 2;
+                median.setText(String.format("%.2f", medianVal));
+            }
         }
 
         //Mode
-        int result = findMode(data);
-        mode.setText(Integer.toString(result));
+        if(!data.isEmpty()) {
+            int result = findMode(data);
+            mode.setText(Integer.toString(result));
+        }
     }
 
     /**
@@ -201,19 +235,23 @@ class Analysis extends JPanel {
         int max = 1;
         float mode = 0;
 
-        for (Float fileDatum : fileData) {
-            if (hashMap.get(fileDatum) != null) { // Already found element
-                int count = hashMap.get(fileDatum);
-                count++;
-                hashMap.put(fileDatum, count);
+        if(fileData.size() > 1) {
+            for (Float fileDatum : fileData) {
+                if (hashMap.get(fileDatum) != null) { // Already found element
+                    int count = hashMap.get(fileDatum);
+                    count++;
+                    hashMap.put(fileDatum, count);
 
-                if (count > max) {
-                    max = count;
-                    mode = fileDatum;
-                }
-            } else // Newly found element
-                hashMap.put(fileDatum, 1);
+                    if (count > max) {
+                        max = count;
+                        mode = fileDatum;
+                    }
+                } else // Newly found element
+                    hashMap.put(fileDatum, 1);
+            }
         }
+        else if(fileData.size() == 1)
+            mode = fileData.get(0);
         return (int) mode;
     }
 }

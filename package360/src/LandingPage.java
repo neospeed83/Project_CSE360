@@ -3,21 +3,41 @@ import java.awt.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+/**
+ * The LandingPage class contains the main method for the program which allows for the
+ * initialization of the program itself. Initial file loading and bound setting is handled
+ * through this class.
+ *
+ * @author Akash Devdhar, Matt Hayes, Henry Pearson, Nicholas Vietri
+ * 		   CSE 360 Team Project
+ *
+ */
 public class LandingPage extends JFrame {
 
     private static boolean errorFlag = false;
+    static boolean emptyFileFlag = false;
 
+    /**
+     * Constructor for the LandingPage class that initializes the starting GUI screen
+     * while also setting bounds to the default values of 0 and 100.
+     */
     private LandingPage() {
         //set default bounds 0, 100
         SetBoundary.updateBoundaries(0, 100);
         initUI();
     }
 
-
+    /**
+     * Method to set the class errorFlag value for subsequent error handling.
+     */
     static void setErrorFlag() {
         LandingPage.errorFlag = true;
     }
 
+    /**
+     * Method that initializes the GUI and allows for the loading of a file and the setting
+     * of the initial bounds.
+     */
     private void initUI() {
         setTitle("Grade Analytics - Load new File");
         setSize(800, 300);
@@ -147,7 +167,14 @@ public class LandingPage extends JFrame {
                     try {
                         MainPage.boundaryFlag = true;
                         new MainPage(jfc.getSelectedFile());
-                        //setEnabled(false);
+                        if(emptyFileFlag) {
+                            log.addError(5);
+                            JOptionPane.showMessageDialog(this,
+                                    "The file inputted is empty",
+                                    "Empty File",
+                                    JOptionPane.ERROR_MESSAGE);
+                            emptyFileFlag = false;
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -158,6 +185,11 @@ public class LandingPage extends JFrame {
         });
     }
 
+    /**
+     * Main method, begins the program by creating an instance of the LandingPage class.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             LandingPage ex = new LandingPage();

@@ -4,16 +4,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The DistributionGraph class maintains the Distribution function of the program
+ * by computing the distribution statistics of the data set.
+ *
+ * @author Akash Devdhar, Matt Hayes, Henry Pearson, Nicholas Vietri
+ * 		   CSE 360 Team Project
+ *
+ */
 class DistributionGraph extends JPanel {
 
     private JTextField firstGroup, secondGroup, thirdGroup, fourthGroup, fifthGroup,
         sixthGroup, seventhGroup, eighthGroup, ninthGroup, tenthGroup;
 
+    /**
+     * Constructor for the DistributionGraph class.
+     */
     DistributionGraph() {
         InitUI();
     }
 
-    //Graph needs to resize to fit panel
+    /**
+     * Method that initializes and fills the statistical values of the program's Distribution function.
+     */
     private void InitUI() {
         setLayout(null);
         List<Float> fileData = MainPage.getFileData();
@@ -214,6 +227,10 @@ class DistributionGraph extends JPanel {
         // Set new dataset
     }
 
+    /**
+     * Method that updates the calculation values of the Distribution statistics, finds the average and count
+     * of each ten percent range in the data set.
+     */
     public void update() {
         List<Float> fileData = MainPage.getFileData();
 

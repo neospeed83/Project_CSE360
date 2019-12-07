@@ -19,7 +19,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * The MainPage class maintains and updates the core features of the program. All program functions,
+ * including those from the initial landing page, are routed through this class.
+ *
+ * @author Akash Devdhar, Matt Hayes, Henry Pearson, Nicholas Vietri
+ * 		   CSE 360 Team Project
+ *
+ */
 class MainPage extends JDialog {
 
     private File selectedFile;
@@ -32,10 +39,16 @@ class MainPage extends JDialog {
     static boolean refreshSwitch = false;
     static boolean initialFileCreation = true;
     static boolean errorFlag = false;
+    static boolean emptyFileFlag = false;
 
     private static String reportContent = "";
     private static int fileNumber = 1;
 
+    /**
+     * Constructor for the MainPage class, initializes the data set for the program.
+     *
+     * @param inputFile file to read
+     */
     MainPage(File inputFile) {
         selectedFile = inputFile;
         dataset = new DefaultCategoryDataset();
@@ -43,14 +56,28 @@ class MainPage extends JDialog {
         InitMainUI();
     }
 
+    /**
+     * Getter method to return the program's data set.
+     *
+     * @return the program's list of data values
+     */
     static List<Float> getFileData() {
         return fileData;
     }
 
+    /**
+     * Getter method to return the program's distribution data set.
+     *
+     * @return the program's distribution data set
+     */
     public static DefaultCategoryDataset getDistributionDataset() {
         return distributionDataset;
     }
 
+    /**
+     * Method that initializes and maintains the GUI of the program's core page. Buttons, tabs,
+     * input areas, and displays are all updated and displayed through this method.
+     */
     private void InitMainUI() {
         setLayout(null);
 
@@ -61,6 +88,9 @@ class MainPage extends JDialog {
 
         //create error log
         ErrorLog log = ErrorLog.getInstance();
+
+        //Set to false on initialization
+        emptyFileFlag = false;
 
         //Error Log - Henry
         //Display Error Log Button
@@ -154,8 +184,17 @@ class MainPage extends JDialog {
                                 break;
                             }
                         }
-                        if(errorFlag)
+                        if(errorFlag) {
                             errorFlag = false;
+                            if (emptyFileFlag) {
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        "The file inputted is empty",
+                                        "Empty File",
+                                        JOptionPane.ERROR_MESSAGE);
+                                emptyFileFlag = false;
+                                log.addError(5);
+                            }
+                        }
                         else if (!boundaryFlag) {
                             MainPage.updateReport("Unsuccessfully appended program with the file: "
                                     + jfc.getSelectedFile() + "\n");
@@ -208,8 +247,17 @@ class MainPage extends JDialog {
                                 break;
                             }
                         }
-                        if(errorFlag)
+                        if(errorFlag) {
                             errorFlag = false;
+                            if (emptyFileFlag) {
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        "The file inputted is empty",
+                                        "Empty File",
+                                        JOptionPane.ERROR_MESSAGE);
+                                emptyFileFlag = false;
+                                log.addError(5);
+                            }
+                        }
                         else if (!boundaryFlag) {
                             JOptionPane.showMessageDialog(jfc,
                                     "The file contains out of bounds data!",
@@ -670,6 +718,11 @@ class MainPage extends JDialog {
         } // else Display main page
     }// End Init ui
 
+    /**
+     * Method to update the program's graph.
+     *
+     * @param catPlot the plot of the program's data
+     */
     //Function for updating display graph
     private void updateDisplayGraph(CategoryPlot catPlot) {
         float max = SetBoundary.getHigherBound();
@@ -719,6 +772,12 @@ class MainPage extends JDialog {
         catPlot.setDataset(dataSet1);
     }
 
+    /**
+     * Method to update the display functionality of the program by printing the data set in
+     * four columns with descending order.
+     *
+     * @param displayData the data on display
+     */
     //Function for updating display data
     private void updateDisplay(JTextArea displayData) {
         //Wipe the previous text data
@@ -782,10 +841,19 @@ class MainPage extends JDialog {
         displayData.setVisible(true);
     }
 
+    /**
+     * Method to update the content of the program's report.
+     *
+     * @param content the status changes of the program
+     */
     public static void updateReport(String content) {
         reportContent += content;
     }
 
+    /**
+     * Method to create an external file that contains the status changes of the current data set.
+     *
+     */
     private void createReportFile() {
         File report = new File("Reports"+ File.separator + "report" + fileNumber + ".txt");
         while(initialFileCreation && report.exists()) {

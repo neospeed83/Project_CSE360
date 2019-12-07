@@ -7,7 +7,22 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.io.*;
 
+/**
+ * The ReadFile class reads the inputted file for the program.
+ *
+ * @author Akash Devdhar, Matt Hayes, Henry Pearson, Nicholas Vietri
+ * 		   CSE 360 Team Project
+ *
+ */
 class ReadFile {
+
+    /**
+     * Method that reads a file and catches accompanying errors for the data set of the program.
+     * If no errors are caught, the method returns the data set for the program.
+     *
+     * @param fileName file to read
+     * @return a list of data values
+     */
     static List<Float> readFileByName(String fileName) {
 
         //create error log
@@ -34,6 +49,13 @@ class ReadFile {
                         elements = null;
                     }
             }
+
+            if(result.isEmpty()) {
+                MainPage.errorFlag = true;
+                MainPage.emptyFileFlag = true;
+                LandingPage.emptyFileFlag = true;
+            }
+
         } catch (NoSuchFileException | FileNotFoundException e) {
             JOptionPane.showMessageDialog(new JFrame(),
                     "Please check your file name",

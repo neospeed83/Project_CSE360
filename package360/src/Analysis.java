@@ -3,11 +3,24 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * The Analysis class creates and maintains the Analysis functions of the program. Calculations
+ * for mean, median, mode, and other analytical statistics and their display are done through
+ * this class.
+ *
+ * @author Akash Devdhar, Matt Hayes, Henry Pearson, Nicholas Vietri
+ * 		   CSE 360 Team Project
+ *
+ */
 class Analysis extends JPanel {
 
     private JTextField count, high, low, mean, median, mode;
     private List<Float> data;
 
+    /**
+     * Constructor for the Analysis class, initializes the GUI components of
+     * the class.
+     */
     Analysis() {
         data = MainPage.getFileData();
         data.sort(null);
@@ -26,6 +39,9 @@ class Analysis extends JPanel {
         InitUI();
     }
 
+    /**
+     * Method that adds and updates the GUI components of the class.
+     */
     private void InitUI() {
         setLayout(null);
 
@@ -128,6 +144,10 @@ class Analysis extends JPanel {
         add(mode);
     }
 
+    /**
+     * Method that updates the statistical values for the calculations of the class;
+     * maximum and minimum value, count of values, mean, median, and mode.
+     */
     public void update(){
         data = MainPage.getFileData();
 
@@ -170,6 +190,12 @@ class Analysis extends JPanel {
         mode.setText(Integer.toString(result));
     }
 
+    /**
+     * Method that finds the mode of the data set.
+     *
+     * @param fileData the data set to find the mode of
+     * @return the mode of the data set
+     */
     private int findMode(List<Float> fileData) {
         HashMap<Float, Integer> hashMap = new HashMap<>();
         int max = 1;
